@@ -14,6 +14,6 @@
         IConsumeObserverConnector,
         IProbeSite
     {
-        Task Handle(BasicDeliverEventArgs message, CancellationToken cancellationToken, Action<ReceiveContext> contextCallback);
+        Task Handle(BasicDeliverEventArgs message, CancellationToken cancellationToken, Action<ReceiveContext> contextCallback = null);
     }
 }
