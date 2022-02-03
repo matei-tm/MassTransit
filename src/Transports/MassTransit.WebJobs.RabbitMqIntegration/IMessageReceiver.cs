@@ -17,7 +17,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
         /// Configure all registered consumers, sagas, and activities on the receiver and handle the message
         /// </summary>
         /// <param name="queueName">The input entity name, used for the receiver InputAddress</param>
-        /// <param name="message">The Service Bus message</param>
+        /// <param name="message">The RabbitMq message</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task Handle(string queueName, BasicDeliverEventArgs message, CancellationToken cancellationToken);
@@ -26,7 +26,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
         /// Configure the specified consumer on the receiver and handle the message
         /// </summary>
         /// <param name="queueName">The input entity name, used for the receiver InputAddress</param>
-        /// <param name="message">The Service Bus message</param>
+        /// <param name="message">The RabbitMq message</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task HandleConsumer<TConsumer>(string queueName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
@@ -36,7 +36,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
         /// Configure the specified saga on the receiver and handle the message
         /// </summary>
         /// <param name="queueName">The input entity name, used for the receiver InputAddress</param>
-        /// <param name="message">The Service Bus message</param>
+        /// <param name="message">The RabbitMq message</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task HandleSaga<TSaga>(string queueName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
         /// Configure the specified execute activity on the receiver and handle the message
         /// </summary>
         /// <param name="queueName">The input entity name, used for the receiver InputAddress</param>
-        /// <param name="message">The Service Bus message</param>
+        /// <param name="message">The RabbitMq message</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task HandleExecuteActivity<TActivity>(string queueName, BasicDeliverEventArgs message, CancellationToken cancellationToken)

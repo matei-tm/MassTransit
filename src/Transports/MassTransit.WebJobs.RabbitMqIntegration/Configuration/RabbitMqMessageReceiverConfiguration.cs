@@ -1,21 +1,21 @@
-﻿using MassTransit.Configuration;
-using MassTransit.Configurators;
-using MassTransit.RabbitMqTransport.Builders;
-using MassTransit.RabbitMqTransport.Configuration;
-using RabbitMQ.Client;
-using System;
-
-namespace MassTransit.WebJobs.RabbitMqIntegration
+﻿namespace MassTransit.WebJobs.RabbitMqIntegration
 {
+    using MassTransit.Configuration;
+    using MassTransit.Configurators;
+    using MassTransit.RabbitMqTransport.Builders;
+    using MassTransit.RabbitMqTransport.Configuration;
+    using System;
+
+
     public class RabbitMqMessageReceiverConfiguration : ReceiverConfiguration
     {
-        private IRabbitMqHostConfiguration hostConfiguration;
-        private IRabbitMqReceiveEndpointConfiguration endpointConfiguration;
+        private IRabbitMqHostConfiguration _hostConfiguration;
+        private IRabbitMqReceiveEndpointConfiguration _endpointConfiguration;
 
         public RabbitMqMessageReceiverConfiguration(IRabbitMqHostConfiguration hostConfiguration, IRabbitMqReceiveEndpointConfiguration endpointConfiguration) : base(endpointConfiguration)
         {
-            this.hostConfiguration = hostConfiguration;
-            this.endpointConfiguration = endpointConfiguration;
+            _hostConfiguration = hostConfiguration;
+            _endpointConfiguration = endpointConfiguration;
         }
 
         public IRabbitMqMessageReceiver Build()
@@ -24,7 +24,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 
             try
             {
-                var builder = new RabbitMqReceiveEndpointBuilder(hostConfiguration, endpointConfiguration);
+                var builder = new RabbitMqReceiveEndpointBuilder(_hostConfiguration, _endpointConfiguration);
 
                 foreach (var specification in Specifications)
                 {

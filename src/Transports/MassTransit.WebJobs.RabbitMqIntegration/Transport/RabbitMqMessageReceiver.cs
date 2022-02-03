@@ -9,6 +9,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+
     public class RabbitMqMessageReceiver : IRabbitMqMessageReceiver
     {
         readonly RabbitMqReceiveEndpointContext _context;
@@ -16,8 +17,8 @@
 
         public RabbitMqMessageReceiver(RabbitMqReceiveEndpointContext rabbitMqReceiveEndpointContext)
         {
-            this._context = rabbitMqReceiveEndpointContext;
-            this._dispatcher = rabbitMqReceiveEndpointContext.CreateReceivePipeDispatcher();
+            _context = rabbitMqReceiveEndpointContext;
+            _dispatcher = rabbitMqReceiveEndpointContext.CreateReceivePipeDispatcher();
         }
 
         void IProbeSite.Probe(ProbeContext context)
@@ -47,7 +48,12 @@
                 exchange: message.Exchange,
                 routingKey: message.RoutingKey,
                 consumerTag: message.ConsumerTag,
-                deliveryTag: message.DeliveryTag, body: message.Body.ToArray(), redelivered: message.Redelivered, properties: message.BasicProperties, _context);
+                deliveryTag: message.DeliveryTag,
+                body: message.Body.ToArray(),
+                redelivered: message.Redelivered,
+                properties: message.BasicProperties,
+                receiveEndpointContext: _context);
+
             contextCallback?.Invoke(context);
 
             CancellationTokenRegistration registration;

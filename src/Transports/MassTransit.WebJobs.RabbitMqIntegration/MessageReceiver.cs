@@ -21,7 +21,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
         public MessageReceiver(IBusRegistrationContext registration, IAsyncBusHandle busHandle, IBusInstance busInstance)
         {
             _hostConfiguration = busInstance.HostConfiguration as IRabbitMqHostConfiguration
-                ?? throw new ConfigurationException("The hostConfiguration was not properly configured for Azure Service Bus");
+                ?? throw new ConfigurationException("The hostConfiguration was not properly configured for RabbitMq");
 
             _registration = registration;
             _busHandle = busHandle;
@@ -96,7 +96,5 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
                 return configurator.Build();
             })).Value;
         }
-
-        
     }
 }
