@@ -1,4 +1,4 @@
-﻿namespace MassTransit.WebJobs.RabbitMqIntegration
+namespace MassTransit.WebJobs.RabbitMqIntegration
 {
     using GreenPipes;
     using MassTransit.Pipeline;
