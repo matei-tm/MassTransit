@@ -20,6 +20,19 @@ master | [![master](https://github.com/MassTransit/MassTransit/actions/workflows
 develop | [![develop](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml/badge.svg?branch=develop&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml)
 documentation | [![documentation](https://github.com/MassTransit/MassTransit/actions/workflows/docs.yml/badge.svg?branch=develop&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/docs.yml)
 
+---
+**NOTE**
+
+Due to breaking changes, involved by [azure-functions-rabbitmq-extension repo](https://github.com/Azure/azure-functions-rabbitmq-extension), related to RabbitMQ.Client v6, the current repo is not using the non-compatible nuget Microsoft.Azure.WebJobs.Extensions.RabbitMQ v1.1.0.  
+Instead, it reffers the azure-functions-rabbitmq-extension as a git submodule.  
+As result, after cloning the repo, proceed with a
+
+```bash
+git submodule update --init --recursive
+```
+
+---
+
 MassTransit NuGet Packages
 ---------------------------
 
