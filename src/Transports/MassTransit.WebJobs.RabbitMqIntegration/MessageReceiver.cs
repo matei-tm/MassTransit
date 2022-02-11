@@ -13,6 +13,9 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
     public class MessageReceiver :
         IMessageReceiver
     {
+        const string PathDelimiter = "_";
+        const string SubscriptionsSubPath = "";
+
         readonly IAsyncBusHandle _busHandle;
         readonly IRabbitMqHostConfiguration _hostConfiguration;
         readonly ConcurrentDictionary<string, Lazy<IRabbitMqMessageReceiver>> _receivers;
@@ -95,6 +98,73 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 
                 return configurator.Build();
             })).Value;
+        }
+
+        IRabbitMqMessageReceiver CreateMessageReceiver(string topicPath, string subscriptionName, Action<IReceiveEndpointConfigurator> configure)
+        {
+            if (string.IsNullOrWhiteSpace(topicPath))
+                throw new ArgumentNullException(nameof(topicPath));
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+
+            var subscriptionPath = string.Concat(topicPath, PathDelimiter, subscriptionName);
+
+            return _receivers.GetOrAdd(subscriptionPath, name => new Lazy<IRabbitMqMessageReceiver>(() =>
+            {
+                var endpointConfiguration = _hostConfiguration.CreateReceiveEndpointConfiguration(subscriptionPath);
+
+                var configurator = new RabbitMqMessageReceiverConfiguration(_hostConfiguration, endpointConfiguration);
+
+                configure(configurator);
+
+                return configurator.Build();
+            })).Value;
+        }
+
+
+        public Task Handle(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+        {
+            var receiver = CreateMessageReceiver(exchangeName, keyName, cfg =>
+            {
+                cfg.ConfigureConsumers(_registration);
+                cfg.ConfigureSagas(_registration);
+            });
+
+            return receiver.Handle(message, cancellationToken);
+        }
+
+        public Task HandleConsumer<TConsumer>(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+            where TConsumer : class, IConsumer
+        {
+            var receiver = CreateMessageReceiver(exchangeName, keyName, cfg =>
+            {
+                cfg.ConfigureConsumer<TConsumer>(_registration);
+            });
+
+            return receiver.Handle(message, cancellationToken);
+        }
+
+        public Task HandleSaga<TSaga>(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+            where TSaga : class, ISaga
+        {
+            var receiver = CreateMessageReceiver(exchangeName, keyName, cfg =>
+            {
+                cfg.ConfigureSaga<TSaga>(_registration);
+            });
+
+            return receiver.Handle(message, cancellationToken);
+        }
+
+
+        public Task HandleExecuteActivity<TActivity>(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+            where TActivity : class
+        {
+            var receiver = CreateMessageReceiver(exchangeName, keyName, cfg =>
+            {
+                cfg.ConfigureExecuteActivity(_registration, typeof(TActivity));
+            });
+
+            return receiver.Handle(message, cancellationToken);
         }
     }
 }

@@ -52,5 +52,18 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
         /// <returns></returns>
         Task HandleExecuteActivity<TActivity>(string queueName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
             where TActivity : class;
+
+        Task Handle(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken);
+
+        Task HandleConsumer<TConsumer>(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+            where TConsumer : class, IConsumer;
+
+
+        Task HandleSaga<TSaga>(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+            where TSaga : class, ISaga;
+
+
+        Task HandleExecuteActivity<TActivity>(string exchangeName, string keyName, BasicDeliverEventArgs message, CancellationToken cancellationToken)
+            where TActivity : class;
     }
 }
