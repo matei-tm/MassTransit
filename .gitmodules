@@ -1,3 +1,0 @@
-[submodule "submodules/azure-functions-rabbitmq-extension"]
-	path = submodules/azure-functions-rabbitmq-extension
-	url = https://github.com/Azure/azure-functions-rabbitmq-extension.git
