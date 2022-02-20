@@ -24,12 +24,10 @@ documentation | [![documentation](https://github.com/MassTransit/MassTransit/act
 **NOTE**
 
 Due to breaking changes, involved by [azure-functions-rabbitmq-extension repo](https://github.com/Azure/azure-functions-rabbitmq-extension), related to RabbitMQ.Client v6, the current repo is not using the non-compatible nuget Microsoft.Azure.WebJobs.Extensions.RabbitMQ v1.1.0.  
-Instead, it reffers the azure-functions-rabbitmq-extension as a git submodule.  
-As result, after cloning the repo, proceed with a
+In order to solve this issue the following actions were taken:
 
-```bash
-git submodule update --init --recursive
-```
+- a prerelease nuget package was published to myget feed https://www.myget.org/F/matei-tm/api/v3/index.json
+- a NuGet.Config file was placed in root
 
 ---
 
