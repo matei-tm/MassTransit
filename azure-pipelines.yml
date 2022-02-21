@@ -1,0 +1,77 @@
+trigger:
+  branches:
+    include:
+      - webjobs-rabbitmq-integration
+  tags:
+    include:
+      - v*.*.*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  isTagTriggered: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+  prefix: $[format('0.{0:yyyy}.{0:MMdd}', pipeline.startTime)]
+  version: $[format('{0}.{1}', variables.prefix, counter(variables.prefix, 1))] # e.g. 0.2001.0203.4
+  fileVersion: $[variables.version]
+
+jobs:
+  - job: buildExtension
+    displayName: Build WebJobs extension
+    steps:
+      - powershell: | # Allow tags matching v1.2.3 and v1.2.3-xyz1
+          $found = '$(Build.SourceBranchName)' | Select-String -Pattern '^v((\d+\.\d+\.\d+)(?:-\w+))*$'
+          if (-not $found) {
+            Write-Error "Found unexpected tag name: $(Build.SourceBranchName)."
+            exit 1
+          }
+          Write-Host "##vso[task.setvariable variable=version]$($found.Matches.Groups[1].Value)"
+          Write-Host "##vso[task.setvariable variable=fileVersion]$($found.Matches.Groups[2].Value)"
+        displayName: Extract version # e.g. 1.2.3
+        condition: and(succeeded(), eq(variables.isTagTriggered, 'True'))
+
+      - task: UseDotNet@2
+        displayName: Acquire .NET SDK
+        inputs:
+          packageType: sdk
+          version: 3.1.x
+          performMultiLevelLookup: true
+
+      - task: UseDotNet@2
+        displayName: Acquire .NET SDK
+        inputs:
+          packageType: sdk
+          version: 5.0.x
+          performMultiLevelLookup: true
+
+      - task: DotNetCoreCLI@2
+        displayName: Build solution
+        inputs:
+          command: build
+          arguments: --configuration Release -property:Version=$(fileVersion) -property:CommitHash=$(Build.SourceVersion)
+
+      - task: DotNetCoreCLI@2
+        displayName: Pack RabbitMq Webjob extension
+        condition: and(succeeded(), eq(variables.isTagTriggered, 'True'))
+        inputs:
+          command: pack
+          searchPatternPack: src/Transports/MassTransit.WebJobs.RabbitMqIntegration/MassTransit.WebJobs.RabbitMqIntegration.csproj
+          configurationToPack: Release
+          buildProperties: Version=$(version);CommitHash=$(Build.SourceVersion)
+          outputDir: $(Build.ArtifactStagingDirectory)\$(version)
+          nobuild: true
+          includesymbols: true
+          verbosityPack: minimal
+
+      - publish: $(Build.ArtifactStagingDirectory)
+        displayName: Publish extension package
+        condition: and(succeeded(), eq(variables.isTagTriggered, 'True'))
+        artifact: drop-extension
+
+      - task: NuGetCommand@2
+        displayName: Publish package to MyGet
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: 'MyGetConnection'
