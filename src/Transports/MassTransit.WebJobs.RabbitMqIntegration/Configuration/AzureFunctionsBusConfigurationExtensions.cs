@@ -53,6 +53,8 @@ namespace MassTransit
                             throw new ArgumentNullException(connectionStringConfigurationKey, "A connection string must be used for Azure Functions.");
                         }
 
+                        cfg.Host(connectionString);
+
                         cfg.UseDelayedMessageScheduler();
 
                         configureBus?.Invoke(context, cfg);
