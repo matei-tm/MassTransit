@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>MassTransit.WebJobs.Extensions.RabbitMQq</PackageId>
+    <PackageId>MassTransit.WebJobs.Extensions.RabbitMQ</PackageId>
     <Title>MassTransit.WebJobs.ServiceBus</Title>
     <PackageTags>MassTransit;Azure;WebJobs;AzureFunctions; RabbitMq</PackageTags>
     <Description>MassTransit Azure WebJobs rabbitMq support; $(Description)</Description>
