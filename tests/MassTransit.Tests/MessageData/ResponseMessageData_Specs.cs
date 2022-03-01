@@ -2,7 +2,6 @@ namespace MassTransit.Tests.MessageData
 {
     using System;
     using System.Threading.Tasks;
-    using GreenPipes;
     using MassTransit.MessageData.Configuration;
     using NUnit.Framework;
     using TestFramework;
@@ -22,6 +21,8 @@ namespace MassTransit.Tests.MessageData
                 InVar.CorrelationId,
                 Key = "Hello"
             });
+
+            Assert.That(response.Message.Key, Is.EqualTo("Hello"));
 
             Assert.That(await response.Message.Value.Value, Is.Not.Empty);
         }

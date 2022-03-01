@@ -1,16 +1,13 @@
+#nullable enable
 namespace MassTransit
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Configuration;
-    using Context;
-    using EndpointConfigurators;
     using Events;
-    using GreenPipes;
-    using GreenPipes.Internals.Extensions;
-    using Pipeline;
-    using Topology;
+    using Internals;
+    using Logging;
     using Transports;
     using Util;
 
@@ -24,7 +21,7 @@ namespace MassTransit
         readonly ILogContext _logContext;
         readonly IPublishEndpoint _publishEndpoint;
         readonly IReceiveEndpoint _receiveEndpoint;
-        Handle _busHandle;
+        Handle? _busHandle;
         BusState _busState;
         string _healthMessage = "not started";
 
@@ -35,6 +32,8 @@ namespace MassTransit
             _host = host;
             _busObservable = busObservable;
             _receiveEndpoint = endpointConfiguration.ReceiveEndpoint;
+
+            _busState = BusState.Created;
 
             Topology = host.Topology;
 
@@ -175,9 +174,9 @@ namespace MassTransit
 
             await _busObservable.PreStart(this).ConfigureAwait(false);
 
-            Handle busHandle = null;
+            Handle? busHandle = null;
 
-            CancellationTokenSource tokenSource = null;
+            CancellationTokenSource? tokenSource = null;
             try
             {
                 if (cancellationToken == default)
@@ -266,7 +265,7 @@ namespace MassTransit
             _busHandle = null;
         }
 
-        public HealthResult CheckHealth()
+        public BusHealthResult CheckHealth()
         {
             return _host.CheckHealth(_busState, _healthMessage);
         }
@@ -328,13 +327,13 @@ namespace MassTransit
             return _host.ConnectEndpointConfigurationObserver(observer);
         }
 
-        HostReceiveEndpointHandle IReceiveConnector.ConnectReceiveEndpoint(IEndpointDefinition definition, IEndpointNameFormatter endpointNameFormatter,
-            Action<IReceiveEndpointConfigurator> configureEndpoint)
+        HostReceiveEndpointHandle IReceiveConnector.ConnectReceiveEndpoint(IEndpointDefinition definition, IEndpointNameFormatter? endpointNameFormatter,
+            Action<IReceiveEndpointConfigurator>? configureEndpoint)
         {
             return _host.ConnectReceiveEndpoint(definition, endpointNameFormatter, configureEndpoint);
         }
 
-        HostReceiveEndpointHandle IReceiveConnector.ConnectReceiveEndpoint(string queueName, Action<IReceiveEndpointConfigurator> configureEndpoint)
+        HostReceiveEndpointHandle IReceiveConnector.ConnectReceiveEndpoint(string queueName, Action<IReceiveEndpointConfigurator>? configureEndpoint)
         {
             return _host.ConnectReceiveEndpoint(queueName, configureEndpoint);
         }

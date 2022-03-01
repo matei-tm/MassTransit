@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using GreenPipes;
     using MassTransit.Courier.Contracts;
     using MongoDB.Driver;
     using MongoDbIntegration.Courier;
@@ -82,13 +81,6 @@
 
             await Bus.Publish<RoutingSlipActivityCompleted>(new RoutingSlipActivityCompletedEvent(_trackingNumber, "Send",
                 NewId.NextGuid(), DateTime.UtcNow));
-        }
-
-        protected override void ConfigureInMemoryBus(IInMemoryBusFactoryConfigurator configurator)
-        {
-            base.ConfigureInMemoryBus(configurator);
-
-            configurator.ConfigureRoutingSlipEventCorrelation();
         }
 
         protected override void ConfigureInMemoryReceiveEndpoint(IInMemoryReceiveEndpointConfigurator configurator)

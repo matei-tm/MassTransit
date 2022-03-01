@@ -1,7 +1,6 @@
 namespace MassTransit.Containers.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -16,6 +15,7 @@ namespace MassTransit.Containers.Tests
 
 
     [TestFixture]
+    [Category("Flaky")]
     public class KillSwitch_Specs :
         BusTestFixture
     {
@@ -39,14 +39,13 @@ namespace MassTransit.Containers.Tests
 
                         cfg.ConfigureEndpoints(context);
                     });
-                })
-                .AddMassTransitHostedService();
+                });
 
             IServiceProvider provider = services.BuildServiceProvider(true);
 
             var healthChecks = provider.GetService<HealthCheckService>();
 
-            IHostedService[] hostedServices = provider.GetRequiredService<IEnumerable<IHostedService>>().ToArray();
+            IHostedService[] hostedServices = provider.GetServices<IHostedService>().ToArray();
 
             await healthChecks.WaitForHealthStatus(HealthStatus.Unhealthy);
 

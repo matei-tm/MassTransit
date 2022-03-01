@@ -1,5 +1,6 @@
-﻿namespace MassTransit.RabbitMqTransport
+﻿namespace MassTransit
 {
+    using System;
     using RabbitMQ.Client;
 
 
@@ -7,17 +8,13 @@
     /// Contains the context of the BasicConsume call received by the BasicConsumer
     /// bound to the inbound RabbitMQ model
     /// </summary>
-    public interface RabbitMqBasicConsumeContext
+    public interface RabbitMqBasicConsumeContext :
+        RoutingKeyConsumeContext
     {
         /// <summary>
         /// The exchange to which to the message was sent
         /// </summary>
         string Exchange { get; }
-
-        /// <summary>
-        /// The routing key specified
-        /// </summary>
-        string RoutingKey { get; }
 
         /// <summary>
         /// The consumer tag of the receiving consumer
@@ -37,6 +34,7 @@
         /// <summary>
         /// The message body, since it's a byte array on RabbitMQ
         /// </summary>
+        [Obsolete("This is a fail, we need to use the Body of receive context")]
         byte[] Body { get; }
     }
 }

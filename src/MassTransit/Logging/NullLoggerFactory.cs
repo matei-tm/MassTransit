@@ -1,9 +1,10 @@
+#nullable enable
 namespace MassTransit.Logging
 {
     using Microsoft.Extensions.Logging;
 
 
-    class NullLoggerFactory :
+    public class NullLoggerFactory :
         ILoggerFactory
     {
         public static readonly NullLoggerFactory Instance = new NullLoggerFactory();

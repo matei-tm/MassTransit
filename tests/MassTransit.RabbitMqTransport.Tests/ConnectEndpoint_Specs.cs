@@ -1,8 +1,8 @@
 namespace MassTransit.RabbitMqTransport.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Monitoring.Health;
     using NUnit.Framework;
     using TestFramework.Messages;
 
@@ -21,13 +21,20 @@ namespace MassTransit.RabbitMqTransport.Tests
 
                 await handle.Ready;
 
-                await using var clientFactory = await handle.CreateClientFactory();
+                var clientFactory = await handle.CreateClientFactory();
+                try
+                {
+                    using RequestHandle<PingMessage> requestHandle = clientFactory.CreateRequest(new PingMessage());
 
-                using RequestHandle<PingMessage> requestHandle = clientFactory.CreateRequest(new PingMessage());
+                    await requestHandle.GetResponse<PongMessage>();
 
-                await requestHandle.GetResponse<PongMessage>();
-
-                await handle.StopAsync(TestCancellationToken);
+                    await handle.StopAsync(TestCancellationToken);
+                }
+                finally
+                {
+                    if (clientFactory is IAsyncDisposable asyncDisposable)
+                        await asyncDisposable.DisposeAsync();
+                }
             }
 
             for (var i = 0; i < 10; i++)

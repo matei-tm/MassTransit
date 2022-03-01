@@ -1,4 +1,4 @@
-namespace MassTransit.GrpcTransport
+namespace MassTransit
 {
     public interface GrpcSendContext<out T> :
         SendContext<T>,
@@ -9,7 +9,8 @@ namespace MassTransit.GrpcTransport
 
 
     public interface GrpcSendContext :
-        SendContext
+        SendContext,
+        RoutingKeySendContext
     {
         /// <summary>
         /// Specify that the published message must be delivered to a queue or it will be returned
@@ -20,10 +21,5 @@ namespace MassTransit.GrpcTransport
         /// The destination exchange for the message
         /// </summary>
         string Exchange { get; }
-
-        /// <summary>
-        /// The routing key for the message (defaults to "")
-        /// </summary>
-        string RoutingKey { get; set; }
     }
 }

@@ -1,11 +1,12 @@
-namespace MassTransit.RabbitMqTransport
+namespace MassTransit
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using Topology;
-    using Util;
+    using System.Text;
+    using Internals;
+    using RabbitMqTransport.Topology;
 
 
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
@@ -188,6 +189,19 @@ namespace MassTransit.RabbitMqTransport
                 default, ExchangeType, BindExchanges, AlternateExchange);
         }
 
+        public Uri ToShortAddress()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append(BindToQueue ? "queue:" : "exchange:");
+            builder.Append(Name);
+
+            string query = string.Join("&", GetQueryStringOptions().Where(x => x != $"{BindQueueKey}=true"));
+            if (!string.IsNullOrWhiteSpace(query))
+                builder.Append('?').Append(query);
+
+            return new Uri(builder.ToString());
+        }
+
         static void ParseLeft(Uri address, out string scheme, out string host, out int? port, out string virtualHost)
         {
             var hostAddress = new RabbitMqHostAddress(address);
@@ -205,11 +219,11 @@ namespace MassTransit.RabbitMqTransport
                 Host = address.Host,
                 Port = address.Port.HasValue
                     ? address.Scheme.EndsWith("s", StringComparison.OrdinalIgnoreCase)
-                        ? address.Port.Value == 5671 ? 0 : address.Port.Value
+                        ? address.Port.Value == 5671 ? -1 : address.Port.Value
                         : address.Port.Value == 5672
-                            ? 0
+                            ? -1
                             : address.Port.Value
-                    : 0,
+                    : -1,
                 Path = address.VirtualHost == "/"
                     ? $"/{address.Name}"
                     : $"/{Uri.EscapeDataString(address.VirtualHost)}/{address.Name}"

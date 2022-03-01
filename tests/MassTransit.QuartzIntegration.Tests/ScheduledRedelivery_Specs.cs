@@ -3,7 +3,6 @@ namespace MassTransit.QuartzIntegration.Tests
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using GreenPipes;
     using NUnit.Framework;
     using TestFramework;
     using TestFramework.Messages;
@@ -32,13 +31,6 @@ namespace MassTransit.QuartzIntegration.Tests
         TaskCompletionSource<ConsumeContext<PingMessage>>[] _received;
         int _count;
         DateTime[] _timestamps;
-
-        protected override void ConfigureInMemoryBus(IInMemoryBusFactoryConfigurator configurator)
-        {
-            base.ConfigureInMemoryBus(configurator);
-
-            configurator.UseMessageScheduler(QuartzAddress);
-        }
 
         protected override void ConfigureInMemoryReceiveEndpoint(IInMemoryReceiveEndpointConfigurator configurator)
         {

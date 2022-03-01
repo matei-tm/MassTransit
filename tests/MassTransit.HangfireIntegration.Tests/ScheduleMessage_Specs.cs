@@ -3,7 +3,6 @@
     using System;
     using System.Diagnostics;
     using System.Threading.Tasks;
-    using GreenPipes;
     using NUnit.Framework;
 
 
@@ -28,6 +27,61 @@
         Task<ConsumeContext<FirstMessage>> _first;
         string _firstActivityId;
         string _secondActivityId;
+
+        protected override void ConfigureInMemoryReceiveEndpoint(IInMemoryReceiveEndpointConfigurator configurator)
+        {
+            _first = Handler<FirstMessage>(configurator, async context =>
+            {
+                _firstActivityId = Activity.Current?.Id;
+                await context.ScheduleSend(TimeSpan.FromSeconds(5), new SecondMessage());
+            });
+
+            _second = Handler<SecondMessage>(configurator, async context =>
+            {
+                _secondActivityId = Activity.Current?.Id;
+            });
+        }
+
+
+        public class FirstMessage
+        {
+        }
+
+
+        public class SecondMessage
+        {
+        }
+    }
+
+
+    [TestFixture]
+    public class ScheduleMessageBson_Specs :
+        HangfireInMemoryTestFixture
+    {
+        [Test]
+        public async Task Should_get_both_messages()
+        {
+            await Scheduler.ScheduleSend(InputQueueAddress, DateTime.Now, new FirstMessage());
+
+            await _first;
+
+            await _second;
+
+            if (_secondActivityId != null && _firstActivityId != null)
+                Assert.That(_secondActivityId.StartsWith(_firstActivityId), Is.True);
+        }
+
+        Task<ConsumeContext<SecondMessage>> _second;
+        Task<ConsumeContext<FirstMessage>> _first;
+        string _firstActivityId;
+        string _secondActivityId;
+
+        protected override void ConfigureInMemoryBus(IInMemoryBusFactoryConfigurator configurator)
+        {
+            base.ConfigureInMemoryBus(configurator);
+
+            configurator.UseBsonSerializer();
+        }
 
         protected override void ConfigureInMemoryReceiveEndpoint(IInMemoryReceiveEndpointConfigurator configurator)
         {

@@ -1,12 +1,14 @@
-﻿namespace MassTransit.ActiveMqTransport
+﻿#nullable enable
+namespace MassTransit
 {
     using System;
-    using Topology;
+    using ActiveMqTransport;
+    using ActiveMqTransport.Topology;
 
 
     public interface IActiveMqBusFactoryConfigurator :
         IBusFactoryConfigurator<IActiveMqReceiveEndpointConfigurator>,
-        IQueueEndpointConfigurator
+        IActiveMqQueueEndpointConfigurator
     {
         new IActiveMqSendTopologyConfigurator SendTopology { get; }
 
@@ -49,17 +51,16 @@
 
         /// <summary>
         /// Specify a consumer endpoint queue name formatter. Generate name for consumer queue using
-        /// topic and endpointname
+        /// topic and endpoint name
         /// </summary>
         /// <param name="formatter"></param>
         public void SetConsumerEndpointQueueNameFormatter(IActiveMqConsumerEndpointQueueNameFormatter formatter);
-
 
         /// <summary>
         /// Specify a temporary queue name formatter. Allows for the transformation of masstransit generated temporary queuenames
         /// e.g. adding a prefix
         /// </summary>
         /// <param name="formatter"></param>
-        public void SetTemporaryQueueNameFormatter(IActiveMqTemporaryQueueNameFormatter formatter);
+        public void SetTemporaryQueueNameFormatter(IActiveMqTemporaryQueueNameFormatter? formatter);
     }
 }

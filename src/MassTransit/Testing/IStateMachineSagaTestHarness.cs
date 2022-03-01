@@ -4,14 +4,15 @@ namespace MassTransit.Testing
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
-    using Automatonymous;
 
 
-    public interface IStateMachineSagaTestHarness<TInstance, out TStateMachine> :
+    public interface ISagaStateMachineTestHarness<out TStateMachine, TInstance> :
         ISagaTestHarness<TInstance>
-        where TInstance : class, SagaStateMachineInstance
         where TStateMachine : SagaStateMachine<TInstance>
+        where TInstance : class, SagaStateMachineInstance
     {
+        TStateMachine StateMachine { get; }
+
         /// <summary>
         /// Waits until a saga exists with the specified correlationId in the specified state
         /// </summary>
@@ -47,5 +48,14 @@ namespace MassTransit.Testing
         /// <param name="timeout"></param>
         /// <returns></returns>
         Task<IList<Guid>> Exists(Expression<Func<TInstance, bool>> expression, State state, TimeSpan? timeout = default);
+    }
+
+
+    [Obsolete("Use ISagaStateMachineTestHarness<TStateMachine, TInstance> instead")]
+    public interface IStateMachineSagaTestHarness<TInstance, out TStateMachine> :
+        ISagaStateMachineTestHarness<TStateMachine, TInstance>
+        where TStateMachine : SagaStateMachine<TInstance>
+        where TInstance : class, SagaStateMachineInstance
+    {
     }
 }

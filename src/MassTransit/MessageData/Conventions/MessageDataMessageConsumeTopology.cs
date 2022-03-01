@@ -1,8 +1,8 @@
 namespace MassTransit.MessageData.Conventions
 {
     using Initializers;
-    using Pipeline.Filters;
-    using Topology;
+    using MassTransit.Configuration;
+    using Middleware;
 
 
     public class MessageDataMessageConsumeTopology<T> :

@@ -3,8 +3,7 @@
     using System;
     using System.Diagnostics;
     using System.Threading.Tasks;
-    using GreenPipes.Internals.Extensions;
-    using MassTransit.Scheduling;
+    using Internals;
     using NUnit.Framework;
 
 
@@ -357,7 +356,7 @@
 
             _first = Handler<FirstMessage>(configurator, async context =>
             {
-                ScheduledMessage<SecondMessage> scheduledMessage = await context.ScheduleSend(TimeSpan.FromSeconds(15), new SecondMessage {Id = _testId});
+                ScheduledMessage<SecondMessage> scheduledMessage = await context.ScheduleSend(TimeSpan.FromSeconds(15), new SecondMessage { Id = _testId });
 
                 await Task.Delay(1000);
 

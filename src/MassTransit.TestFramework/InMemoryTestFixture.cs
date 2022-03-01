@@ -5,7 +5,6 @@ namespace MassTransit.TestFramework
     using NUnit.Framework;
     using NUnit.Framework.Internal;
     using Testing;
-    using Util;
 
 
     public class InMemoryTestFixture :
@@ -49,13 +48,13 @@ namespace MassTransit.TestFramework
         [SetUp]
         public Task SetupInMemoryTest()
         {
-            return TaskUtil.Completed;
+            return Task.CompletedTask;
         }
 
         [TearDown]
         public Task TearDownInMemoryTest()
         {
-            return TaskUtil.Completed;
+            return Task.CompletedTask;
         }
 
         protected IRequestClient<TRequest> CreateRequestClient<TRequest>()

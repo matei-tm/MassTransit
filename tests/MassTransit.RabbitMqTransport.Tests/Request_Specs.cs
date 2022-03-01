@@ -2,9 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using GreenPipes;
     using NUnit.Framework;
-    using Serialization;
     using Shouldly;
     using TestFramework.Messages;
 
@@ -255,7 +253,8 @@
         [OneTimeTearDown]
         public async Task Teardown()
         {
-            await _clientFactory.DisposeAsync();
+            if (_clientFactory is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync();
         }
 
         protected override void ConfigureRabbitMqReceiveEndpoint(IRabbitMqReceiveEndpointConfigurator configurator)
@@ -326,7 +325,8 @@
         [OneTimeTearDown]
         public async Task Teardown()
         {
-            await _clientFactory.DisposeAsync();
+            if (_clientFactory is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync();
         }
 
         protected override void ConfigureRabbitMqReceiveEndpoint(IRabbitMqReceiveEndpointConfigurator configurator)
@@ -455,7 +455,8 @@
         [OneTimeTearDown]
         public async Task Teardown()
         {
-            await _clientFactory.DisposeAsync();
+            if (_clientFactory is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync();
         }
 
         protected override void ConfigureRabbitMqReceiveEndpoint(IRabbitMqReceiveEndpointConfigurator configurator)

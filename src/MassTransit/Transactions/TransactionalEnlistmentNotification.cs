@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Context;
+    using Logging;
     using Util;
 
 
@@ -36,7 +37,7 @@
                 // We can't stop any messages that might have been already published, but we can stop the rest from publishing.
                 // With a message broker, you should support idempotence, and so retry is a valid mechanism to handle this scenario
 
-                preparingEnlistment.ForceRollback();
+                preparingEnlistment.ForceRollback(e);
             }
         }
 

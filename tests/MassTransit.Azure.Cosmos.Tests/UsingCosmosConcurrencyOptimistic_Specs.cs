@@ -4,9 +4,8 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
-    using Cosmos.Saga;
-    using GreenPipes;
-    using MassTransit.Saga;
+    using AzureCosmos;
+    using AzureCosmos.Saga;
     using Microsoft.Azure.Cosmos;
     using NUnit.Framework;
     using TestFramework;
@@ -29,7 +28,7 @@
             {
                 var correlationId = NewId.NextGuid();
 
-                await InputQueueSendEndpoint.Send(new RehersalBegins {CorrelationId = correlationId});
+                await InputQueueSendEndpoint.Send(new RehersalBegins { CorrelationId = correlationId });
 
                 sagaIds[i] = correlationId;
             }
@@ -84,7 +83,7 @@
         {
             var correlationId = NewId.NextGuid();
 
-            await InputQueueSendEndpoint.Send(new RehersalBegins {CorrelationId = correlationId});
+            await InputQueueSendEndpoint.Send(new RehersalBegins { CorrelationId = correlationId });
 
             var saga = await GetSagaRetry(correlationId, TestTimeout);
 
@@ -219,7 +218,7 @@
         {
             base.ConfigureInMemoryBus(configurator);
 
-            configurator.TransportConcurrencyLimit = 16;
+            configurator.ConcurrentMessageLimit = 16;
         }
     }
 }

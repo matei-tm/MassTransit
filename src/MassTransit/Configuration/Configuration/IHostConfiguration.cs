@@ -1,10 +1,9 @@
-﻿namespace MassTransit.Configuration
+﻿#nullable enable
+namespace MassTransit.Configuration
 {
     using System;
-    using Context;
-    using EndpointConfigurators;
-    using GreenPipes;
-    using Topology;
+    using Logging;
+    using Transports;
 
 
     public interface IHostConfiguration :
@@ -26,11 +25,11 @@
 
         ISendObserver SendObservers { get; }
 
-        ILogContext LogContext { get; set; }
-        ILogContext ReceiveLogContext { get; }
-        ILogContext SendLogContext { get; }
+        ILogContext? LogContext { get; set; }
+        ILogContext? ReceiveLogContext { get; }
+        ILogContext? SendLogContext { get; }
 
-        IHostTopology HostTopology { get; }
+        IBusTopology Topology { get; }
 
         IRetryPolicy ReceiveTransportRetryPolicy { get; }
 
@@ -40,7 +39,7 @@
         /// <param name="queueName"></param>
         /// <param name="configure"></param>
         /// <returns></returns>
-        IReceiveEndpointConfiguration CreateReceiveEndpointConfiguration(string queueName, Action<IReceiveEndpointConfigurator> configure = null);
+        IReceiveEndpointConfiguration CreateReceiveEndpointConfiguration(string queueName, Action<IReceiveEndpointConfigurator>? configure = null);
 
         /// <summary>
         /// Called by the base ReceiveEndpointContext constructor so that the observer collections are connected to the bus observer

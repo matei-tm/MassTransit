@@ -1,12 +1,13 @@
-namespace MassTransit.ActiveMqTransport
+namespace MassTransit
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using ActiveMqTransport;
+    using ActiveMqTransport.Topology;
     using Initializers;
     using Initializers.TypeConverters;
-    using Topology;
-    using Util;
+    using Internals;
 
 
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
@@ -121,26 +122,6 @@ namespace MassTransit.ActiveMqTransport
             Type = type;
         }
 
-        ActiveMqEndpointAddress(string scheme, string host, int? port, string virtualHost, string name, bool durable, bool autoDelete,
-            AddressType type = AddressType.Queue)
-        {
-            Scheme = scheme;
-            Host = host;
-            Port = port;
-            VirtualHost = virtualHost;
-            Name = name;
-            Durable = durable;
-            AutoDelete = autoDelete;
-            Type = type;
-        }
-
-        public ActiveMqEndpointAddress GetDelayAddress()
-        {
-            var name = $"{Name}_delay";
-
-            return new ActiveMqEndpointAddress(Scheme, Host, Port, VirtualHost, name, Durable, AutoDelete, Type);
-        }
-
         static void ParseLeft(Uri address, out string scheme, out string host, out int? port, out string virtualHost)
         {
             var hostAddress = new ActiveMqHostAddress(address);
@@ -158,11 +139,11 @@ namespace MassTransit.ActiveMqTransport
                 Host = address.Host,
                 Port = address.Port.HasValue
                     ? address.Scheme.EndsWith("s", StringComparison.OrdinalIgnoreCase)
-                        ? address.Port.Value == 5671 ? 0 : address.Port.Value
+                        ? address.Port.Value == 5671 ? -1 : address.Port.Value
                         : address.Port.Value == 5672
-                            ? 0
+                            ? -1
                             : address.Port.Value
-                    : 0,
+                    : -1,
                 Path = address.VirtualHost == "/"
                     ? $"/{address.Name}"
                     : $"/{Uri.EscapeDataString(address.VirtualHost)}/{address.Name}"

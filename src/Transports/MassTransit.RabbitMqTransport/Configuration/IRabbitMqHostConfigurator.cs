@@ -1,6 +1,11 @@
-﻿namespace MassTransit.RabbitMqTransport
+﻿namespace MassTransit
 {
     using System;
+    using System.Threading.Tasks;
+    using RabbitMQ.Client;
+
+
+    public delegate Task RefreshConnectionFactoryCallback(ConnectionFactory connectionFactory);
 
 
     public interface IRabbitMqHostConfigurator
@@ -71,12 +76,14 @@
         /// Configure the RabbitMQ Batch Publish transport settings
         /// </summary>
         /// <param name="configure"></param>
-        void ConfigureBatchPublish(Action<IBatchPublishConfigurator> configure);
+        void ConfigureBatchPublish(Action<IRabbitMqBatchPublishConfigurator> configure);
 
         /// <summary>
         /// Sets the continuation timeout for command communication with RabbitMQ
         /// </summary>
         /// <param name="timeout"></param>
         void ContinuationTimeout(TimeSpan timeout);
+
+        RefreshConnectionFactoryCallback OnRefreshConnectionFactory { set; }
     }
 }

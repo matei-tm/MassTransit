@@ -1,10 +1,8 @@
+#nullable enable
 namespace MassTransit.Mediator.Contexts
 {
     using System;
-    using Clients;
-    using Endpoints;
-    using GreenPipes;
-    using Pipeline;
+    using Transports;
 
 
     public class MediatorClientFactoryContext :
@@ -42,13 +40,13 @@ namespace MassTransit.Mediator.Contexts
 
         public Uri ResponseAddress { get; }
 
-        public IRequestSendEndpoint<T> GetRequestEndpoint<T>(ConsumeContext consumeContext = default)
+        public IRequestSendEndpoint<T> GetRequestEndpoint<T>(ConsumeContext? consumeContext = default)
             where T : class
         {
             return new MediatorRequestSendEndpoint<T>(_endpoint, consumeContext);
         }
 
-        public IRequestSendEndpoint<T> GetRequestEndpoint<T>(Uri destinationAddress, ConsumeContext consumeContext = default)
+        public IRequestSendEndpoint<T> GetRequestEndpoint<T>(Uri destinationAddress, ConsumeContext? consumeContext = default)
             where T : class
         {
             return new MediatorRequestSendEndpoint<T>(_endpoint, consumeContext);

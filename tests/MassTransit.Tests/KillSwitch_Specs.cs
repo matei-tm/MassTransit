@@ -3,12 +3,12 @@ namespace MassTransit.Tests
     using System;
     using System.Linq;
     using System.Threading.Tasks;
-    using MassTransit.Testing;
     using NUnit.Framework;
     using TestFramework;
 
 
     [TestFixture]
+    [Category("Flaky")]
     public class KillSwitch_Specs :
         InMemoryTestFixture
     {
@@ -40,7 +40,7 @@ namespace MassTransit.Tests
 
         protected override void ConfigureInMemoryReceiveEndpoint(IInMemoryReceiveEndpointConfigurator configurator)
         {
-            configurator.ConcurrencyLimit = 20;
+            configurator.ConcurrentMessageLimit = 20;
             configurator.Consumer<BadConsumer>();
         }
 

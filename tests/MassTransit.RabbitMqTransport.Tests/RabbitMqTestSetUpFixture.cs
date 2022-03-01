@@ -1,6 +1,5 @@
 using NUnit.Framework;
 
-[assembly: Parallelizable(ParallelScope.None)]
 [assembly: LevelOfParallelism(1)]
 
 
@@ -11,7 +10,7 @@ namespace MassTransit.RabbitMqTransport.Tests
     using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
-    using RabbitMqTransport.Testing;
+    using MassTransit.Testing;
 
 
     [SetUpFixture]

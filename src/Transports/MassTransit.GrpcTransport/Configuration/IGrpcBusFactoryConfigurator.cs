@@ -1,19 +1,12 @@
-namespace MassTransit.GrpcTransport
+#nullable enable
+namespace MassTransit
 {
     using System;
-    using Topology.Configurators;
 
 
     public interface IGrpcBusFactoryConfigurator :
         IBusFactoryConfigurator<IGrpcReceiveEndpointConfigurator>
     {
-        /// <summary>
-        /// Sets the maximum number of threads used by an in-memory transport, for partitioning
-        /// the input queue. This setting also specifies how many threads will be used for dispatching
-        /// messages to consumers.
-        /// </summary>
-        int TransportConcurrencyLimit { set; }
-
         new IGrpcPublishTopologyConfigurator PublishTopology { get; }
 
         /// <summary>
@@ -21,7 +14,7 @@ namespace MassTransit.GrpcTransport
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="configureTopology"></param>
-        void Publish<T>(Action<IGrpcMessagePublishTopologyConfigurator<T>> configureTopology)
+        void Publish<T>(Action<IGrpcMessagePublishTopologyConfigurator<T>>? configureTopology)
             where T : class;
 
         /// <summary>
@@ -29,7 +22,7 @@ namespace MassTransit.GrpcTransport
         /// </summary>
         /// <param name="configure"></param>
         /// <returns></returns>
-        void Host(Action<IGrpcHostConfigurator> configure = null);
+        void Host(Action<IGrpcHostConfigurator>? configure = null);
 
         /// <summary>
         /// Configure the base address for the host
@@ -37,6 +30,6 @@ namespace MassTransit.GrpcTransport
         /// <param name="baseAddress">The base address for the in-memory host</param>
         /// <param name="configure"></param>
         /// <returns></returns>
-        void Host(Uri baseAddress, Action<IGrpcHostConfigurator> configure = null);
+        void Host(Uri baseAddress, Action<IGrpcHostConfigurator>? configure = null);
     }
 }
