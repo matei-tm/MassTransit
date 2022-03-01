@@ -10,10 +10,10 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 
     public class RabbitMqMessageReceiver : IRabbitMqMessageReceiver
     {
-        readonly ReceiveEndpointContext _context;
+        readonly RabbitMqReceiveEndpointContext _context;
         readonly IReceivePipeDispatcher _dispatcher;
 
-        public RabbitMqMessageReceiver(ReceiveEndpointContext rabbitMqReceiveEndpointContext)
+        public RabbitMqMessageReceiver(RabbitMqReceiveEndpointContext rabbitMqReceiveEndpointContext)
         {
             _context = rabbitMqReceiveEndpointContext;
             _dispatcher = rabbitMqReceiveEndpointContext.CreateReceivePipeDispatcher();
@@ -50,7 +50,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
                 body: message.Body.ToArray(),
                 redelivered: message.Redelivered,
                 properties: message.BasicProperties,
-                receiveEndpointContext: _context as RabbitMqReceiveEndpointContext);
+                receiveEndpointContext: _context);
 
             contextCallback?.Invoke(context);
 
