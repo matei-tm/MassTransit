@@ -1,9 +1,8 @@
 namespace MassTransit.WebJobs.RabbitMqIntegration
 {
     using MassTransit.RabbitMqTransport.Configuration;
+    using MassTransit.Transports;
     using RabbitMQ.Client.Events;
-    using Registration;
-    using Saga;
     using System;
     using System.Collections.Concurrent;
     using System.Threading;

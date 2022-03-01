@@ -1,11 +1,9 @@
 namespace MassTransit.WebJobs.RabbitMqIntegration
 {
     using MassTransit.Configuration;
-    using MassTransit.Configurators;
-    using MassTransit.RabbitMqTransport.Builders;
     using MassTransit.RabbitMqTransport.Configuration;
     using System;
-
+    using System.Collections.Generic;
 
     public class RabbitMqMessageReceiverConfiguration : ReceiverConfiguration
     {
@@ -20,7 +18,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 
         public IRabbitMqMessageReceiver Build()
         {
-            var result = BusConfigurationResult.CompileResults(Validate());
+            IReadOnlyList<ValidationResult> result = Validate().ThrowIfContainsFailure($"{GetType().Name} configuration is invalid:");
 
             try
             {
@@ -35,7 +33,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException(result, "An exception occurred creating the EventDataReceiver", ex);
+                throw new ConfigurationException(result, "An exception occurred creating the RabbitMqMessageReceiver", ex);
             }
         }
     }

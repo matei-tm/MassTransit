@@ -1,7 +1,6 @@
 namespace MassTransit.WebJobs.RabbitMqIntegration
 {
     using RabbitMQ.Client.Events;
-    using Saga;
     using System;
     using System.Threading;
     using System.Threading.Tasks;

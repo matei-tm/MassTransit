@@ -2,7 +2,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using GreenPipes.Internals.Extensions;
+    using MassTransit.Internals;
     using Microsoft.Extensions.Logging;
 
 

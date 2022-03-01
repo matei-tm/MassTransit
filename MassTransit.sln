@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistence", "Persistence", "{56F516D7-BC3C-49E1-A639-83C5F14953F8}"
 EndProject
@@ -118,33 +118,35 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.EventHubIntegra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.EventHubIntegration.Tests", "tests\MassTransit.EventHubIntegration.Tests\MassTransit.EventHubIntegration.Tests.csproj", "{24CC1B47-AE01-4871-A939-2BF6EB789860}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Azure.Table", "src\Persistence\MassTransit.Azure.Table\MassTransit.Azure.Table.csproj", "{338E2B7E-4301-4547-9172-4415F739C029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Azure.Table", "src\Persistence\MassTransit.Azure.Table\MassTransit.Azure.Table.csproj", "{338E2B7E-4301-4547-9172-4415F739C029}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Azure.Table.Tests", "tests\MassTransit.Azure.Table.Tests\MassTransit.Azure.Table.Tests.csproj", "{17E04A9B-5DB5-4857-99CD-E9AF22DA00E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Azure.Table.Tests", "tests\MassTransit.Azure.Table.Tests\MassTransit.Azure.Table.Tests.csproj", "{17E04A9B-5DB5-4857-99CD-E9AF22DA00E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.GrpcTransport", "src\Transports\MassTransit.GrpcTransport\MassTransit.GrpcTransport.csproj", "{AF56509B-0B95-4ACE-9CFC-F9A79756C357}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.GrpcTransport", "src\Transports\MassTransit.GrpcTransport\MassTransit.GrpcTransport.csproj", "{AF56509B-0B95-4ACE-9CFC-F9A79756C357}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.GrpcTransport.Tests", "tests\MassTransit.GrpcTransport.Tests\MassTransit.GrpcTransport.Tests.csproj", "{082488F6-6322-462A-85D7-9E893A67B8CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.GrpcTransport.Tests", "tests\MassTransit.GrpcTransport.Tests\MassTransit.GrpcTransport.Tests.csproj", "{082488F6-6322-462A-85D7-9E893A67B8CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Transports.Tests", "tests\MassTransit.Transports.Tests\MassTransit.Transports.Tests.csproj", "{7632EDAF-29A1-4E69-952F-C75D3BF34B3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Transports.Tests", "tests\MassTransit.Transports.Tests\MassTransit.Transports.Tests.csproj", "{7632EDAF-29A1-4E69-952F-C75D3BF34B3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Abstractions", "src\MassTransit.Abstractions\MassTransit.Abstractions.csproj", "{2CAF0C51-2F64-4EB0-8E27-AE3E0085CA75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Abstractions", "src\MassTransit.Abstractions\MassTransit.Abstractions.csproj", "{2CAF0C51-2F64-4EB0-8E27-AE3E0085CA75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.StateMachineVisualizer", "src\MassTransit.StateMachineVisualizer\MassTransit.StateMachineVisualizer.csproj", "{8CD4298E-962B-4D04-821D-274343099E83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.StateMachineVisualizer", "src\MassTransit.StateMachineVisualizer\MassTransit.StateMachineVisualizer.csproj", "{8CD4298E-962B-4D04-821D-274343099E83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Abstractions.Tests", "tests\MassTransit.Abstractions.Tests\MassTransit.Abstractions.Tests.csproj", "{AB188378-1BAC-4ECB-98A7-91E12C861381}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Abstractions.Tests", "tests\MassTransit.Abstractions.Tests\MassTransit.Abstractions.Tests.csproj", "{AB188378-1BAC-4ECB-98A7-91E12C861381}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.BenchmarkConsole", "tests\MassTransit.BenchmarkConsole\MassTransit.BenchmarkConsole.csproj", "{2B6ACCF2-0CAF-4152-901F-0048390971E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.BenchmarkConsole", "tests\MassTransit.BenchmarkConsole\MassTransit.BenchmarkConsole.csproj", "{2B6ACCF2-0CAF-4152-901F-0048390971E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Benchmark", "tests\MassTransit.Benchmark\MassTransit.Benchmark.csproj", "{667E52D5-E1D9-49EE-B364-3CB7E43EE160}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Benchmark", "tests\MassTransit.Benchmark\MassTransit.Benchmark.csproj", "{667E52D5-E1D9-49EE-B364-3CB7E43EE160}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.Newtonsoft", "src\MassTransit.Newtonsoft\MassTransit.Newtonsoft.csproj", "{388085C8-1BC8-48F8-8EA2-3698FCB385E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.Newtonsoft", "src\MassTransit.Newtonsoft\MassTransit.Newtonsoft.csproj", "{388085C8-1BC8-48F8-8EA2-3698FCB385E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarking", "Benchmarking", "{BF384860-70ED-47F0-B276-13D2DA9ECD87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.DynamoDbIntegration", "src\Persistence\MassTransit.DynamoDbIntegration\MassTransit.DynamoDbIntegration.csproj", "{186D6491-ECCD-49EB-8E99-AFD7AD6037D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.DynamoDbIntegration", "src\Persistence\MassTransit.DynamoDbIntegration\MassTransit.DynamoDbIntegration.csproj", "{186D6491-ECCD-49EB-8E99-AFD7AD6037D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransit.DynamoDbIntegration.Tests", "tests\MassTransit.DynamoDbIntegration.Tests\MassTransit.DynamoDbIntegration.Tests.csproj", "{694E06CF-2842-4E71-8CD2-81FA7C1B3D13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.DynamoDbIntegration.Tests", "tests\MassTransit.DynamoDbIntegration.Tests\MassTransit.DynamoDbIntegration.Tests.csproj", "{694E06CF-2842-4E71-8CD2-81FA7C1B3D13}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit.WebJobs.RabbitMqIntegration", "src\Transports\MassTransit.WebJobs.RabbitMqIntegration\MassTransit.WebJobs.RabbitMqIntegration.csproj", "{164E6698-FA8E-4087-86B0-4C750FEEC814}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -821,6 +823,18 @@ Global
 		{694E06CF-2842-4E71-8CD2-81FA7C1B3D13}.ReleaseUnsigned|Any CPU.Build.0 = Debug|Any CPU
 		{694E06CF-2842-4E71-8CD2-81FA7C1B3D13}.ReleaseUnsigned|x86.ActiveCfg = Debug|Any CPU
 		{694E06CF-2842-4E71-8CD2-81FA7C1B3D13}.ReleaseUnsigned|x86.Build.0 = Debug|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Debug|x86.Build.0 = Debug|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Release|x86.ActiveCfg = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.Release|x86.Build.0 = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.ReleaseUnsigned|Any CPU.ActiveCfg = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.ReleaseUnsigned|Any CPU.Build.0 = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
+		{164E6698-FA8E-4087-86B0-4C750FEEC814}.ReleaseUnsigned|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -874,11 +888,12 @@ Global
 		{AF56509B-0B95-4ACE-9CFC-F9A79756C357} = {0006D6BB-1382-4B32-AD32-CA037F5CD4F6}
 		{082488F6-6322-462A-85D7-9E893A67B8CD} = {0006D6BB-1382-4B32-AD32-CA037F5CD4F6}
 		{7632EDAF-29A1-4E69-952F-C75D3BF34B3B} = {0006D6BB-1382-4B32-AD32-CA037F5CD4F6}
-		{388085C8-1BC8-48F8-8EA2-3698FCB385E5} = {4F40E08B-7C24-4D2A-8476-B7F93D0A2910}
-		{667E52D5-E1D9-49EE-B364-3CB7E43EE160} = {BF384860-70ED-47F0-B276-13D2DA9ECD87}
 		{2B6ACCF2-0CAF-4152-901F-0048390971E4} = {BF384860-70ED-47F0-B276-13D2DA9ECD87}
+		{667E52D5-E1D9-49EE-B364-3CB7E43EE160} = {BF384860-70ED-47F0-B276-13D2DA9ECD87}
+		{388085C8-1BC8-48F8-8EA2-3698FCB385E5} = {4F40E08B-7C24-4D2A-8476-B7F93D0A2910}
 		{186D6491-ECCD-49EB-8E99-AFD7AD6037D2} = {56F516D7-BC3C-49E1-A639-83C5F14953F8}
 		{694E06CF-2842-4E71-8CD2-81FA7C1B3D13} = {56F516D7-BC3C-49E1-A639-83C5F14953F8}
+		{164E6698-FA8E-4087-86B0-4C750FEEC814} = {0006D6BB-1382-4B32-AD32-CA037F5CD4F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {43D3A7D5-0945-435E-8D03-1E631E5CDBA8}

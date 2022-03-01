@@ -1,7 +1,5 @@
 namespace MassTransit
 {
-    using ExtensionsDependencyInjectionIntegration;
-    using MassTransit.RabbitMqTransport;
     using MassTransit.WebJobs.RabbitMqIntegration;
     using Microsoft.ApplicationInsights.DependencyCollector;
     using Microsoft.Azure.WebJobs.Extensions.RabbitMQ;
@@ -28,7 +26,7 @@ namespace MassTransit
         /// <returns></returns>
         public static IServiceCollection AddMassTransitForAzureFunctions(
             this IServiceCollection services,
-            Action<IServiceCollectionBusConfigurator> configure,
+            Action<IBusRegistrationConfigurator> configure,
             string connectionStringConfigurationKey = "RabbitMQ",
             Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> configureBus = default)
         {

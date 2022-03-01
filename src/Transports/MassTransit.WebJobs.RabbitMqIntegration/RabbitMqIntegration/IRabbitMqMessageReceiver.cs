@@ -1,7 +1,5 @@
 namespace MassTransit.WebJobs.RabbitMqIntegration
 {
-    using GreenPipes;
-    using MassTransit.Pipeline;
     using RabbitMQ.Client.Events;
     using System;
     using System.Threading;

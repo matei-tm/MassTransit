@@ -1,8 +1,6 @@
 namespace MassTransit.WebJobs.RabbitMqIntegration
 {
-    using GreenPipes;
-    using MassTransit.Pipeline;
-    using MassTransit.RabbitMqTransport.Contexts;
+    using MassTransit.RabbitMqTransport;
     using MassTransit.Transports;
     using RabbitMQ.Client.Events;
     using System;
@@ -12,10 +10,10 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 
     public class RabbitMqMessageReceiver : IRabbitMqMessageReceiver
     {
-        readonly RabbitMqReceiveEndpointContext _context;
+        readonly ReceiveEndpointContext _context;
         readonly IReceivePipeDispatcher _dispatcher;
 
-        public RabbitMqMessageReceiver(RabbitMqReceiveEndpointContext rabbitMqReceiveEndpointContext)
+        public RabbitMqMessageReceiver(ReceiveEndpointContext rabbitMqReceiveEndpointContext)
         {
             _context = rabbitMqReceiveEndpointContext;
             _dispatcher = rabbitMqReceiveEndpointContext.CreateReceivePipeDispatcher();
@@ -52,7 +50,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
                 body: message.Body.ToArray(),
                 redelivered: message.Redelivered,
                 properties: message.BasicProperties,
-                receiveEndpointContext: _context);
+                receiveEndpointContext: _context as RabbitMqReceiveEndpointContext);
 
             contextCallback?.Invoke(context);
 
