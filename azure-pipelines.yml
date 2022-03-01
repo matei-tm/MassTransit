@@ -31,17 +31,24 @@ jobs:
         condition: and(succeeded(), eq(variables.isTagTriggered, 'True'))
 
       - task: UseDotNet@2
-        displayName: Acquire .NET SDK
+        displayName: Acquire .NET SDK 3.1
         inputs:
           packageType: sdk
           version: 3.1.x
           performMultiLevelLookup: true
 
       - task: UseDotNet@2
-        displayName: Acquire .NET SDK
+        displayName: Acquire .NET SDK 5.0
         inputs:
           packageType: sdk
           version: 5.0.x
+          performMultiLevelLookup: true
+
+      - task: UseDotNet@2
+        displayName: Acquire .NET SDK 6.0
+        inputs:
+          packageType: sdk
+          version: 6.0.x
           performMultiLevelLookup: true
 
       - task: DotNetCoreCLI@2

@@ -16,6 +16,7 @@ Build Status
 
 Branch | Status
 --- | :---:
+webjobs-rabbitmq-integration | [![Build Status](https://matei-tm.visualstudio.com/AzureFunctionsWithMassTransit/_apis/build/status/matei-tm.MassTransit?branchName=webjobs-rabbitmq-integration)](https://matei-tm.visualstudio.com/AzureFunctionsWithMassTransit/_build/latest?definitionId=10&branchName=webjobs-rabbitmq-integration)
 master | [![master](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml/badge.svg?branch=master&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml)
 develop | [![develop](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml/badge.svg?branch=develop&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml)
 documentation | [![documentation](https://github.com/MassTransit/MassTransit/actions/workflows/docs.yml/badge.svg?branch=develop&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/docs.yml)
