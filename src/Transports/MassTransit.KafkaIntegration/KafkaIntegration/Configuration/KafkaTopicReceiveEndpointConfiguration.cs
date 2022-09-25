@@ -20,6 +20,7 @@ namespace MassTransit.KafkaIntegration.Configuration
         readonly PipeConfigurator<ConsumerContext<TKey, TValue>> _consumerConfigurator;
         readonly IReceiveEndpointConfiguration _endpointConfiguration;
         readonly IKafkaHostConfiguration _hostConfiguration;
+        readonly Action<IClient, string> _oAuthBearerTokenRefreshHandler;
         readonly IOptionsSet _options;
         IHeadersDeserializer _headersDeserializer;
         IDeserializer<TKey> _keyDeserializer;
@@ -27,12 +28,14 @@ namespace MassTransit.KafkaIntegration.Configuration
         IDeserializer<TValue> _valueDeserializer;
 
         public KafkaTopicReceiveEndpointConfiguration(IKafkaHostConfiguration hostConfiguration, ConsumerConfig consumerConfig, string topic,
-            IBusInstance busInstance, IReceiveEndpointConfiguration endpointConfiguration, IHeadersDeserializer headersDeserializer)
+            IBusInstance busInstance, IReceiveEndpointConfiguration endpointConfiguration, IHeadersDeserializer headersDeserializer,
+            Action<IClient, string> oAuthBearerTokenRefreshHandler)
             : base(endpointConfiguration)
         {
             _hostConfiguration = hostConfiguration;
             _busInstance = busInstance;
             _endpointConfiguration = endpointConfiguration;
+            _oAuthBearerTokenRefreshHandler = oAuthBearerTokenRefreshHandler;
             _consumerConfig = consumerConfig;
             _options = new OptionsSet();
             Topic = topic;
@@ -46,6 +49,7 @@ namespace MassTransit.KafkaIntegration.Configuration
             CheckpointMessageCount = 5000;
             MessageLimit = 10000;
             ConcurrencyLimit = 1;
+            PrefetchCount = Math.Max(1000, CheckpointMessageCount / 10);
 
             _consumerConfigurator = new PipeConfigurator<ConsumerContext<TKey, TValue>>();
         }
@@ -201,6 +205,8 @@ namespace MassTransit.KafkaIntegration.Configuration
                     consumerBuilder.SetKeyDeserializer(_keyDeserializer);
                 if (_offsetsCommittedHandler != null)
                     consumerBuilder.SetOffsetsCommittedHandler(_offsetsCommittedHandler);
+                if (_oAuthBearerTokenRefreshHandler != null)
+                    consumerBuilder.SetOAuthBearerTokenRefreshHandler(_oAuthBearerTokenRefreshHandler);
 
                 return consumerBuilder;
             }

@@ -4,7 +4,6 @@ namespace MassTransit.Configuration
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Mime;
-    using Courier;
 
 
     public abstract class BusFactoryConfigurator :
@@ -38,6 +37,11 @@ namespace MassTransit.Configuration
         public bool DeployTopologyOnly
         {
             set => _busConfiguration.HostConfiguration.DeployTopologyOnly = value;
+        }
+
+        public bool DeployPublishTopology
+        {
+            set => _busConfiguration.HostConfiguration.DeployPublishTopology = value;
         }
 
         public int? ConcurrentMessageLimit
@@ -244,7 +248,7 @@ namespace MassTransit.Configuration
 
         public void AddDeserializer(ISerializerFactory factory, bool isDefault = false)
         {
-            _busConfiguration.Serialization.AddDeserializer(factory);
+            _busConfiguration.Serialization.AddDeserializer(factory, isDefault);
         }
 
         public void ClearSerialization()

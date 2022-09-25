@@ -30,7 +30,7 @@
             if (subscriptionName.Length > 50)
             {
                 string hashed;
-                using (var hasher = new SHA1Managed())
+                using (var hasher = SHA1.Create())
                 {
                     var buffer = Encoding.UTF8.GetBytes(subscriptionName);
                     var hash = hasher.ComputeHash(buffer);
@@ -51,6 +51,20 @@
                 throw new ArgumentNullException(nameof(entityName));
 
             return FormatSubscriptionName(string.IsNullOrWhiteSpace(hostScope) ? entityName : $"{entityName}-{hostScope}");
+        }
+
+        IServiceBusMessagePublishTopologyConfigurator IServiceBusPublishTopologyConfigurator.GetMessageTopology(Type messageType)
+        {
+            return GetMessageTopology(messageType) as IServiceBusMessagePublishTopologyConfigurator;
+        }
+
+        public BrokerTopology GetPublishBrokerTopology()
+        {
+            var builder = new PublishEndpointBrokerTopologyBuilder(this);
+
+            ForEachMessageType<IServiceBusMessagePublishTopology>(x => x.Apply(builder));
+
+            return builder.BuildBrokerTopology();
         }
 
         IServiceBusMessagePublishTopologyConfigurator<T> IServiceBusPublishTopologyConfigurator.GetMessageTopology<T>()

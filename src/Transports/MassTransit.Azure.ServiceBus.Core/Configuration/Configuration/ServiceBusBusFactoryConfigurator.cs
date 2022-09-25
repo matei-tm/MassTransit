@@ -93,12 +93,19 @@ namespace MassTransit.Configuration
             configureTopology?.Invoke(configurator);
         }
 
-        public void Publish<T>(Action<IServiceBusMessagePublishTopologyConfigurator<T>> configureTopology)
+        public void Publish<T>(Action<IServiceBusMessagePublishTopologyConfigurator<T>>? configureTopology)
             where T : class
         {
             IServiceBusMessagePublishTopologyConfigurator<T> configurator = _busConfiguration.Topology.Publish.GetMessageTopology<T>();
 
             configureTopology?.Invoke(configurator);
+        }
+
+        public void Publish(Type messageType, Action<IServiceBusMessagePublishTopologyConfigurator>? configure = null)
+        {
+            var configurator = _busConfiguration.Topology.Publish.GetMessageTopology(messageType);
+
+            configure?.Invoke(configurator);
         }
 
         public new IServiceBusSendTopologyConfigurator SendTopology => _busConfiguration.Topology.Send;
@@ -182,14 +189,14 @@ namespace MassTransit.Configuration
             set => _queueConfigurator.RequiresSession = value;
         }
 
+        public int MaxConcurrentCallsPerSession
+        {
+            set => _queueConfigurator.MaxConcurrentCallsPerSession = value;
+        }
+
         public string UserMetadata
         {
             set => _queueConfigurator.UserMetadata = value;
-        }
-
-        public void SelectBasicTier()
-        {
-            _settings.SelectBasicTier();
         }
 
         public TimeSpan MessageWaitTimeout

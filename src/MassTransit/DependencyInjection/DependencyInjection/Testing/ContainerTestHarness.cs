@@ -6,7 +6,6 @@ namespace MassTransit.DependencyInjection.Testing
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Courier;
     using MassTransit.Testing;
     using MassTransit.Testing.Implementations;
     using Microsoft.Extensions.DependencyInjection;
@@ -92,6 +91,8 @@ namespace MassTransit.DependencyInjection.Testing
         public IPublishedMessageList Published => _published.Value.Messages;
         public ISentMessageList Sent => _sent.Value.Messages;
 
+        public IServiceScope Scope => _scope.Value;
+
         public IEndpointNameFormatter EndpointNameFormatter => _provider.GetService<IEndpointNameFormatter>() ?? DefaultEndpointNameFormatter.Instance;
 
         public IBus Bus => _provider.GetRequiredService<IBus>();
@@ -162,13 +163,16 @@ namespace MassTransit.DependencyInjection.Testing
             return provider.GetSendEndpoint(shortName);
         }
 
-        public Task Start()
+        public async Task Start()
         {
-            _hostedServices = _provider.GetService<IEnumerable<IHostedService>>();
+            _hostedServices = _provider.GetServices<IHostedService>().ToArray();
             if (_hostedServices == null)
                 throw new ConfigurationException("The MassTransit hosted service was not found.");
 
-            return Task.WhenAll(_hostedServices.Select(x => x.StartAsync(CancellationToken)));
+            foreach (var service in _hostedServices)
+            {
+                await service.StartAsync(CancellationToken).ConfigureAwait(false);
+            }
         }
 
         public TimeSpan TestTimeout { get; set; } = Debugger.IsAttached ? TimeSpan.FromMinutes(50) : TimeSpan.FromSeconds(30);

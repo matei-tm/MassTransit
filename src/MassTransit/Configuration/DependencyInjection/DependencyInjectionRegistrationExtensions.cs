@@ -11,6 +11,7 @@ namespace MassTransit
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
     using Monitoring;
+    using Transports;
 
 
     /// <summary>
@@ -32,13 +33,13 @@ namespace MassTransit
                     "AddMassTransit() was already called and may only be called once per container. To configure additional bus instances, refer to the documentation: https://masstransit-project.com/usage/containers/multibus.html");
             }
 
+            AddHostedService(collection);
+
             var configurator = new ServiceCollectionBusConfigurator(collection);
 
             configure?.Invoke(configurator);
 
             configurator.Complete();
-
-            AddHostedService(collection);
 
             return collection;
         }
@@ -83,13 +84,13 @@ namespace MassTransit
                     $"AddMassTransit<{typeof(TBus).Name},{typeof(TBusInstance).Name}>() was already called and may only be called once per container. To configure additional bus instances, refer to the documentation: https://masstransit-project.com/usage/containers/multibus.html");
             }
 
+            AddHostedService(collection);
+
             var configurator = new ServiceCollectionBusConfigurator<TBus, TBusInstance>(collection);
 
             configure?.Invoke(configurator);
 
             configurator.Complete();
-
-            AddHostedService(collection);
 
             return collection;
         }
@@ -107,13 +108,51 @@ namespace MassTransit
             if (configure == null)
                 throw new ArgumentNullException(nameof(configure));
 
+            AddHostedService(collection);
+
             var doIt = new Callback<TBus>(collection, configure);
 
             BusInstanceBuilder.Instance.GetBusInstanceType(doIt);
 
-            AddHostedService(collection);
-
             return collection;
+        }
+
+        /// <summary>
+        /// In some situations, it may be necessary to Remove the MassTransitHostedService from the container, such as
+        /// when using older versions of the Azure Functions runtime.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection RemoveMassTransitHostedService(this IServiceCollection services)
+        {
+            return RemoveHostedService<MassTransitHostedService>(services);
+        }
+
+        /// <summary>
+        /// Remove the specified hosted service from the service collection
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection RemoveHostedService<T>(this IServiceCollection services)
+            where T : IHostedService
+        {
+            var descriptor = services.FirstOrDefault(x => x.ServiceType == typeof(IHostedService) && x.ImplementationType == typeof(T));
+            if (descriptor != null)
+                services.Remove(descriptor);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Replace a scoped service registration with a new one
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        public static void ReplaceScoped<TService, TImplementation>(this IServiceCollection services)
+            where TService : class
+            where TImplementation : class, TService
+        {
+            services.Replace(new ServiceDescriptor(typeof(TService), typeof(TImplementation), ServiceLifetime.Scoped));
         }
 
         static void AddHostedService(IServiceCollection collection)
@@ -124,6 +163,33 @@ namespace MassTransit
 
             collection.AddOptions<MassTransitHostOptions>();
             collection.TryAddEnumerable(ServiceDescriptor.Singleton<IHostedService, MassTransitHostedService>());
+        }
+
+        internal static void RemoveMassTransit(this IServiceCollection collection)
+        {
+            collection.RemoveAll<IClientFactory>();
+            collection.RemoveAll<Bind<IBus, IBusRegistrationContext>>();
+            collection.RemoveAll<IBusRegistrationContext>();
+            collection.RemoveAll(typeof(IReceiveEndpointDispatcher<>));
+            collection.RemoveAll<IReceiveEndpointDispatcherFactory>();
+
+
+            collection.RemoveAll<IBusDepot>();
+            collection.RemoveAll<ScopedConsumeContextProvider>();
+            collection.RemoveAll<IScopedBusContextProvider<IBus>>();
+            collection.RemoveAll<ConsumeContext>();
+            collection.RemoveAll<ISendEndpointProvider>();
+            collection.RemoveAll<IPublishEndpoint>();
+            collection.RemoveAll<IConsumeScopeProvider>();
+            collection.RemoveAll(typeof(IRequestClient<>));
+
+            collection.RemoveAll<Bind<IBus, IBusInstance>>();
+            collection.RemoveAll<IBusInstance>();
+            collection.RemoveAll<IReceiveEndpointConnector>();
+            collection.RemoveAll<IBusControl>();
+            collection.RemoveAll<IBus>();
+
+            collection.RemoveAll<IScopedClientFactory>();
         }
 
 

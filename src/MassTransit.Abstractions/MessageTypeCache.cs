@@ -13,7 +13,8 @@ namespace MassTransit
     {
         static CachedType GetOrAdd(Type type)
         {
-            return Cached.Instance.GetOrAdd(type, _ => (CachedType)Activator.CreateInstance(typeof(CachedType<>).MakeGenericType(type)));
+            return Cached.Instance.GetOrAdd(type, _ => Activator.CreateInstance(typeof(CachedType<>).MakeGenericType(type)) as CachedType
+                ?? throw new InvalidOperationException("Failed to create cached message type"));
         }
 
         public static IEnumerable<PropertyInfo> GetProperties(Type type)
@@ -24,6 +25,11 @@ namespace MassTransit
         public static bool IsValidMessageType(Type type)
         {
             return GetOrAdd(type).IsValidMessageType;
+        }
+
+        public static string? InvalidMessageTypeReason(Type type)
+        {
+            return GetOrAdd(type).InvalidMessageTypeReason;
         }
 
         public static bool IsTemporaryMessageType(Type type)
@@ -64,6 +70,7 @@ namespace MassTransit
             bool HasSagaInterfaces { get; }
             bool IsTemporaryMessageType { get; }
             bool IsValidMessageType { get; }
+            string? InvalidMessageTypeReason { get; }
             Type[] MessageTypes { get; }
             string[] MessageTypeNames { get; }
             IEnumerable<PropertyInfo> Properties { get; }
@@ -77,6 +84,7 @@ namespace MassTransit
             bool CachedType.HasSagaInterfaces => MessageTypeCache<T>.HasSagaInterfaces;
             bool CachedType.IsTemporaryMessageType => MessageTypeCache<T>.IsTemporaryMessageType;
             bool CachedType.IsValidMessageType => MessageTypeCache<T>.IsValidMessageType;
+            string? CachedType.InvalidMessageTypeReason => MessageTypeCache<T>.InvalidMessageTypeReason;
             public Type[] MessageTypes => MessageTypeCache<T>.MessageTypes;
             public string[] MessageTypeNames => MessageTypeCache<T>.MessageTypeNames;
 
@@ -142,8 +150,8 @@ namespace MassTransit
 
         static bool CheckIfTemporaryMessageType(Type messageTypeInfo)
         {
-            return !messageTypeInfo.IsVisible && messageTypeInfo.IsClass
-                || messageTypeInfo.IsGenericType && messageTypeInfo.GetGenericArguments().Any(x => CheckIfTemporaryMessageType(x.GetTypeInfo()));
+            return (!messageTypeInfo.IsVisible && messageTypeInfo.IsClass)
+                || (messageTypeInfo.IsGenericType && messageTypeInfo.GetGenericArguments().Any(x => CheckIfTemporaryMessageType(x.GetTypeInfo())));
         }
 
         /// <summary>

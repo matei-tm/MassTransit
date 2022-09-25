@@ -1,12 +1,13 @@
 ﻿namespace MassTransit.Batching
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Context;
+    using Logging;
     using Util;
 
 
@@ -22,7 +23,9 @@
         readonly int _messageLimit;
         readonly SortedDictionary<Guid, ConsumeContext<TMessage>> _messages;
         readonly Timer _timer;
+        Activity _currentActivity;
         DateTime _lastMessage;
+        ILogContext _logContext;
 
         public BatchConsumer(int messageLimit, TimeSpan timeLimit, ChannelExecutor executor, ChannelExecutor dispatcher,
             IPipe<ConsumeContext<Batch<TMessage>>> consumerPipe)
@@ -52,10 +55,6 @@
                 if (context.ReceiveContext.IsDelivered)
                     return;
 
-                // again, if it's already faulted, we don't want to fault it again
-                if (context.ReceiveContext.IsFaulted)
-                    return;
-
                 throw;
             }
         }
@@ -74,12 +73,16 @@
 
                 List<ConsumeContext<TMessage>> messages = GetMessageBatchInOrder();
 
-                return _dispatcher.Push(() => Deliver(messages[0], messages, BatchCompletionMode.Time));
+                return _dispatcher.Push(() => Deliver(messages[messages.Count - 1], messages, BatchCompletionMode.Time));
             }));
         }
 
-        public Task Add(ConsumeContext<TMessage> context)
+        public Task Add(ConsumeContext<TMessage> context, Activity currentActivity)
         {
+            _logContext ??= LogContext.Current;
+            if (currentActivity != null)
+                _currentActivity = currentActivity;
+
             var messageId = context.MessageId ?? NewId.NextGuid();
             _messages.Add(messageId, context);
 
@@ -112,14 +115,18 @@
             List<ConsumeContext<TMessage>> consumeContexts = GetMessageBatchInOrder();
             return consumeContexts.Count == 0
                 ? Task.CompletedTask
-                : _dispatcher.Push(() => Deliver(consumeContexts.Last(), consumeContexts, BatchCompletionMode.Forced));
+                : _dispatcher.Push(() => Deliver(consumeContexts[consumeContexts.Count - 1], consumeContexts, BatchCompletionMode.Forced));
         }
 
         async Task Deliver(ConsumeContext context, IReadOnlyList<ConsumeContext<TMessage>> messages, BatchCompletionMode batchCompletionMode)
         {
             _timer.Dispose();
 
-            Batch<TMessage> batch = new Batch(_firstMessage, _lastMessage, batchCompletionMode, messages);
+            LogContext.SetCurrentIfNull(_logContext);
+
+            Activity.Current = _currentActivity;
+
+            Batch<TMessage> batch = new MessageBatch<TMessage>(_firstMessage, _lastMessage, batchCompletionMode, messages);
 
             ConsumeContext<Batch<TMessage>> batchConsumeContext = new BatchConsumeContext<TMessage>(context, batch);
 
@@ -150,40 +157,6 @@
             return _messages.Values
                 .OrderBy(x => x.SentTime ?? x.MessageId?.ToNewId().Timestamp ?? default)
                 .ToList();
-        }
-
-
-        class Batch :
-            Batch<TMessage>
-        {
-            readonly IReadOnlyList<ConsumeContext<TMessage>> _messages;
-
-            public Batch(DateTime firstMessageReceived, DateTime lastMessageReceived, BatchCompletionMode mode,
-                IReadOnlyList<ConsumeContext<TMessage>> messages)
-            {
-                FirstMessageReceived = firstMessageReceived;
-                LastMessageReceived = lastMessageReceived;
-                Mode = mode;
-                _messages = messages;
-            }
-
-            public BatchCompletionMode Mode { get; }
-            public DateTime FirstMessageReceived { get; }
-            public DateTime LastMessageReceived { get; }
-
-            public ConsumeContext<TMessage> this[int index] => _messages[index];
-
-            public int Length => _messages.Count;
-
-            public IEnumerator<ConsumeContext<TMessage>> GetEnumerator()
-            {
-                return _messages.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
         }
     }
 }

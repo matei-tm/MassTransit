@@ -49,6 +49,17 @@
             return ActivatorUtilities.GetServiceOrCreateInstance<T>(_scope.ServiceProvider);
         }
 
+        public T CreateInstance<T>(params object[] arguments)
+            where T : class
+        {
+            return ActivatorUtilities.CreateInstance<T>(_scope.ServiceProvider, arguments);
+        }
+
+        public IDisposable PushConsumeContext(ConsumeContext context)
+        {
+            return _scope.ServiceProvider.GetRequiredService<ScopedConsumeContextProvider>().PushContext(context);
+        }
+
         public ValueTask DisposeAsync()
         {
             if (_scope is IAsyncDisposable asyncDisposable)

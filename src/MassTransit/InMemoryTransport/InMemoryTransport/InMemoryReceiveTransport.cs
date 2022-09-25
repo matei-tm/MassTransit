@@ -45,12 +45,12 @@ namespace MassTransit.InMemoryTransport
             IMessageQueue<InMemoryTransportContext, InMemoryTransportMessage> queue =
                 _context.MessageFabric.GetQueue(_context.TransportContext, _queueName);
 
-            IDeadLetterTransport deadLetterTransport =
-                new InMemoryMessageDeadLetterTransport(_context.MessageFabric.GetExchange(_context.TransportContext, $"{_queueName}_skipped"));
+            IDeadLetterTransport deadLetterTransport = new InMemoryMessageDeadLetterTransport(_context.MessageFabric.GetExchange(_context.TransportContext,
+                _context.Send.DeadLetterQueueNameFormatter.FormatDeadLetterQueueName(_queueName)));
             _context.AddOrUpdatePayload(() => deadLetterTransport, _ => deadLetterTransport);
 
-            IErrorTransport errorTransport =
-                new InMemoryMessageErrorTransport(_context.MessageFabric.GetExchange(_context.TransportContext, $"{_queueName}_error"));
+            IErrorTransport errorTransport = new InMemoryMessageErrorTransport(_context.MessageFabric.GetExchange(_context.TransportContext,
+                _context.Send.ErrorQueueNameFormatter.FormatErrorQueueName(_queueName)));
             _context.AddOrUpdatePayload(() => errorTransport, _ => errorTransport);
 
             return new ReceiveTransportAgent(_context, queue);
@@ -166,8 +166,7 @@ namespace MassTransit.InMemoryTransport
 
                 await _context.TransportObservers.NotifyCompleted(_context.InputAddress, metrics).ConfigureAwait(false);
 
-                LogContext.Debug?.Log("Consumer completed {InputAddress}: {DeliveryCount} received, {ConcurrentDeliveryCount} concurrent",
-                    _context.InputAddress, metrics.DeliveryCount, metrics.ConcurrentDeliveryCount);
+                _context.LogConsumerCompleted(metrics.DeliveryCount, metrics.ConcurrentDeliveryCount);
 
                 await base.StopAgent(context).ConfigureAwait(false);
             }

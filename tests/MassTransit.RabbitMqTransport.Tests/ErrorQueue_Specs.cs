@@ -77,7 +77,15 @@
         {
             ConsumeContext<PingMessage> context = await _errorHandler;
 
-            context.ReceiveContext.TransportHeaders.Get("MT-Reason", (string)null).ShouldBe("fault");
+            context.ReceiveContext.TransportHeaders.Get(MessageHeaders.Reason, (string)null).ShouldBe("fault");
+        }
+
+        [Test]
+        public async Task Should_have_the_error_queue_header()
+        {
+            ConsumeContext<PingMessage> context = await _errorHandler;
+
+            context.ReceiveContext.TransportHeaders.Get(MessageHeaders.FaultInputAddress, (Uri)null).ShouldBe(InputQueueAddress);
         }
 
         [Test]
@@ -102,7 +110,8 @@
 
         protected override void ConfigureRabbitMqBus(IRabbitMqBusFactoryConfigurator configurator)
         {
-            configurator.ReceiveEndpoint("input_queue_error", x =>
+            var queueName = configurator.SendTopology.ErrorQueueNameFormatter.FormatErrorQueueName(RabbitMqTestHarness.InputQueueName);
+            configurator.ReceiveEndpoint(queueName, x =>
             {
                 x.PurgeOnStartup = true;
 

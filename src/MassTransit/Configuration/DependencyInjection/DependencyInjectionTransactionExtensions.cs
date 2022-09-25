@@ -1,5 +1,6 @@
 ﻿namespace MassTransit
 {
+    using DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Transactions;
@@ -15,16 +16,8 @@
         public static void AddTransactionalEnlistmentBus(this IBusRegistrationConfigurator busConfigurator)
         {
             busConfigurator.TryAddSingleton<ITransactionalBus>(provider => new TransactionalEnlistmentBus(provider.GetService<IBus>()));
-        }
 
-        /// <summary>
-        /// Adds <see cref="ITransactionalBus" /> to the container with scoped lifetime, which can be used to release the messages to the bus
-        /// immediately after a transaction commit. This has a very limited purpose and is not meant for general use.
-        /// It is recommended this is scoped within a unit of work (e.g. Http Request)
-        /// </summary>
-        public static void AddTransactionalBus(this IBusRegistrationConfigurator busConfigurator)
-        {
-            busConfigurator.TryAddScoped<ITransactionalBus>(provider => new TransactionalBus(provider.GetService<IBus>()));
+            busConfigurator.ReplaceScoped<IScopedBusContextProvider<IBus>, TransactionalScopedBusContextProvider<IBus>>();
         }
 
         /// <summary>
@@ -36,6 +29,20 @@
             where TBus : class, IBus
         {
             busConfigurator.TryAddSingleton<ITransactionalBus>(provider => new TransactionalEnlistmentBus(provider.GetRequiredService<TBus>()));
+
+            busConfigurator.ReplaceScoped<IScopedBusContextProvider<TBus>, TransactionalScopedBusContextProvider<TBus>>();
+        }
+
+        /// <summary>
+        /// Adds <see cref="ITransactionalBus" /> to the container with scoped lifetime, which can be used to release the messages to the bus
+        /// immediately after a transaction commit. This has a very limited purpose and is not meant for general use.
+        /// It is recommended this is scoped within a unit of work (e.g. Http Request)
+        /// </summary>
+        public static void AddTransactionalBus(this IBusRegistrationConfigurator busConfigurator)
+        {
+            busConfigurator.TryAddScoped<ITransactionalBus>(provider => new TransactionalBus(provider.GetService<IBus>()));
+
+            busConfigurator.ReplaceScoped<IScopedBusContextProvider<IBus>, TransactionalScopedBusContextProvider<IBus>>();
         }
 
         /// <summary>
@@ -47,6 +54,8 @@
             where TBus : class, IBus
         {
             busConfigurator.TryAddScoped<ITransactionalBus>(provider => new TransactionalBus(provider.GetRequiredService<TBus>()));
+
+            busConfigurator.ReplaceScoped<IScopedBusContextProvider<TBus>, TransactionalScopedBusContextProvider<TBus>>();
         }
     }
 }

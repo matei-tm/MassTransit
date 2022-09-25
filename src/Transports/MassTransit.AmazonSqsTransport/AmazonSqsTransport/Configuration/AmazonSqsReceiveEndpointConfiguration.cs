@@ -69,6 +69,15 @@
             var transport = new ReceiveTransport<ClientContext>(_hostConfiguration, context,
                 () => context.ClientContextSupervisor, clientPipe);
 
+            if (IsBusEndpoint)
+            {
+                var publishTopology = _hostConfiguration.Topology.PublishTopology;
+
+                var brokerTopology = publishTopology.GetPublishBrokerTopology();
+
+                transport.PreStartPipe = new ConfigureAmazonSqsTopologyFilter<IPublishTopology>(publishTopology, brokerTopology).ToPipe();
+            }
+
             var receiveEndpoint = new ReceiveEndpoint(transport, context);
 
             var queueName = _settings.EntityName ?? NewId.Next().ToString(FormatUtil.Formatter);
@@ -135,6 +144,11 @@
                 throw new ArgumentNullException(nameof(topicName));
 
             _endpointConfiguration.Topology.Consume.Bind(topicName, configure);
+        }
+
+        public int RedeliverVisibilityTimeout
+        {
+            set => _settings.RedeliverVisibilityTimeout = value;
         }
 
         public void Subscribe<T>(Action<IAmazonSqsTopicSubscriptionConfigurator> configure = null)

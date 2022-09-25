@@ -12,7 +12,9 @@ namespace MassTransit.Transports
         IReceivePipeDispatcher
     {
         readonly string _activityName;
+        readonly string _endpointName;
         readonly IHostConfiguration _hostConfiguration;
+        readonly string _inputAddress;
         readonly ReceiveObservable _observers;
         readonly IReceivePipe _receivePipe;
 
@@ -26,7 +28,9 @@ namespace MassTransit.Transports
             _observers = observers;
             _hostConfiguration = hostConfiguration;
 
+            _inputAddress = inputAddress.ToString();
             _activityName = $"{inputAddress.GetDiagnosticEndpointName()} receive";
+            _endpointName = inputAddress.GetEndpointName();
         }
 
         public int ActiveDispatchCount => _activeDispatchCount;
@@ -46,7 +50,7 @@ namespace MassTransit.Transports
 
             var active = StartDispatch();
 
-            StartedActivity? activity = LogContext.IfEnabled(_activityName)?.StartReceiveActivity(context);
+            StartedActivity? activity = LogContext.Current?.StartReceiveActivity(_activityName, _inputAddress, _endpointName, context);
             try
             {
                 if (_observers.Count > 0)
@@ -75,12 +79,20 @@ namespace MassTransit.Transports
                     try
                     {
                         await receiveLock.Faulted(ex).ConfigureAwait(false);
+
+                        activity?.AddExceptionEvent(ex);
                     }
                     catch (Exception releaseLockException)
                     {
-                        throw new AggregateException("ReceiveLock.Faulted threw an exception", releaseLockException, ex);
+                        var aggregateException = new AggregateException("ReceiveLock.Faulted threw an exception", releaseLockException, ex);
+
+                        activity?.AddExceptionEvent(aggregateException);
+
+                        throw aggregateException;
                     }
                 }
+                else
+                    activity?.AddExceptionEvent(ex);
 
                 throw;
             }

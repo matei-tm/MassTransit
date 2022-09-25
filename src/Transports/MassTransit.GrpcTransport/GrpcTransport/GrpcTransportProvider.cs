@@ -11,7 +11,7 @@ namespace MassTransit.GrpcTransport
     using Grpc.Net.Client;
     using Internals;
     using MassTransit.Middleware;
-    using Topology;
+    using Metadata;
     using Transports;
     using Transports.Fabric;
 
@@ -75,7 +75,7 @@ namespace MassTransit.GrpcTransport
 
         public IMessageFabric<NodeContext, GrpcTransportMessage> MessageFabric => _messageFabric;
 
-        public Task<ISendTransport> CreateSendTransport(ReceiveEndpointContext receiveEndpointContext, Uri address)
+        public async Task<ISendTransport> CreateSendTransport(ReceiveEndpointContext receiveEndpointContext, Uri address)
         {
             LogContext.SetCurrentIfNull(_hostConfiguration.LogContext);
 
@@ -83,11 +83,11 @@ namespace MassTransit.GrpcTransport
 
             TransportLogMessages.CreateSendTransport(address);
 
-            var exchange = _messageFabric.GetExchange(HostNodeContext, endpointAddress.Name, endpointAddress.ExchangeType);
+            IMessageExchange<GrpcTransportMessage> exchange = _messageFabric.GetExchange(HostNodeContext, endpointAddress.Name, endpointAddress.ExchangeType);
 
-            var transportContext = new ExchangeGrpcSendTransportContext(_hostConfiguration, receiveEndpointContext, exchange);
+            var transportContext = new GrpcSendTransportContext(_hostConfiguration, receiveEndpointContext, exchange);
 
-            return Task.FromResult<ISendTransport>(new GrpcSendTransport(transportContext));
+            return new SendTransport<PipeContext>(transportContext);
         }
 
         public Uri NormalizeAddress(Uri address)
@@ -112,18 +112,19 @@ namespace MassTransit.GrpcTransport
 
         IGrpcClient GetClient(Uri address)
         {
-            var channel = GrpcChannel.ForAddress(address.GetLeftPart(UriPartial.Authority), new GrpcChannelOptions
-            {
-                Credentials = ChannelCredentials.Insecure,
-                MaxReceiveMessageSize = MaxMessageLengthBytes
-            });
+            var channel = HostMetadataCache.IsNetFramework
+                ? (ChannelBase)new Channel(address.Host, address.Port, ChannelCredentials.Insecure)
+                : GrpcChannel.ForAddress(address.GetLeftPart(UriPartial.Authority), new GrpcChannelOptions
+                {
+                    Credentials = ChannelCredentials.Insecure,
+                    MaxReceiveMessageSize = MaxMessageLengthBytes,
+                });
 
             var client = new TransportService.TransportServiceClient(channel);
 
             var clientNodeContext = new ClientNodeContext(address);
 
             var node = _nodeCollection.GetNode(clientNodeContext);
-
 
             return new GrpcClient(_hostConfiguration, _hostNode, client, node);
         }

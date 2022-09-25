@@ -4,12 +4,10 @@ namespace MassTransit.Configuration
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using Courier;
     using DependencyInjection.Registration;
     using Internals;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
-    using Microsoft.Extensions.Logging;
 
 
     /// <summary>
@@ -24,7 +22,7 @@ namespace MassTransit.Configuration
 
         protected RegistrationConfigurator(IServiceCollection collection, IContainerRegistrar registrar)
         {
-            _collection = collection;
+            _collection = collection ?? throw new ArgumentNullException(nameof(collection));
 
             Registrar = registrar ?? new DependencyInjectionContainerRegistrar(collection);
 
@@ -32,8 +30,6 @@ namespace MassTransit.Configuration
         }
 
         public IContainerRegistrar Registrar { get; }
-
-        protected Func<IServiceProvider, IBus, IClientFactory> ClientFactoryProvider { get; } = BusClientFactoryProvider;
 
         public IConsumerRegistrationConfigurator<T> AddConsumer<T>(Action<IConsumerConfigurator<T>> configure)
             where T : class, IConsumer
@@ -204,10 +200,7 @@ namespace MassTransit.Configuration
 
         public void SetSagaRepositoryProvider(ISagaRepositoryRegistrationProvider provider)
         {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
-
-            _sagaRepositoryRegistrationProvider = provider;
+            _sagaRepositoryRegistrationProvider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
         public IEnumerator<ServiceDescriptor> GetEnumerator()
@@ -285,6 +278,9 @@ namespace MassTransit.Configuration
 
                     register.Configure(this, _sagaRepositoryRegistrationProvider);
                 }
+
+                if (Registrar.GetRegistrations<IFutureRegistration>().Any() && _collection.All(x => x.ServiceType != typeof(ISagaRepository<FutureState>)))
+                    new ConfigureSagaRepository<FutureState>().Configure(this, _sagaRepositoryRegistrationProvider);
             }
         }
 
@@ -303,16 +299,7 @@ namespace MassTransit.Configuration
 
         protected static void ConfigureLogContext(IServiceProvider provider)
         {
-            var loggerFactory = provider.GetService<ILoggerFactory>();
-            if (loggerFactory != null)
-                LogContext.ConfigureCurrentLogContext(loggerFactory);
-            else if (LogContext.Current == null)
-                LogContext.ConfigureCurrentLogContext();
-        }
-
-        static IClientFactory BusClientFactoryProvider(IServiceProvider provider, IBus bus)
-        {
-            return bus.CreateClientFactory();
+            LogContext.ConfigureCurrentLogContextIfNull(provider);
         }
 
 

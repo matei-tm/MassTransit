@@ -21,9 +21,8 @@ namespace MassTransit.AzureServiceBusTransport.Topology
 
         public IServiceBusEndpointEntityConfigurator Configurator { get; }
 
-        public bool UsingBasicTier { get; private set; }
-
         public abstract bool RequiresSession { get; }
+        public abstract int MaxConcurrentCallsPerSession { get; }
 
         public TimeSpan SessionIdleTimeout { get; set; }
 
@@ -46,10 +45,5 @@ namespace MassTransit.AzureServiceBusTransport.Topology
         }
 
         protected abstract IEnumerable<string> GetQueryStringOptions();
-
-        public virtual void SelectBasicTier()
-        {
-            UsingBasicTier = true;
-        }
     }
 }

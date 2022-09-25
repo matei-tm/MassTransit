@@ -23,12 +23,18 @@ namespace MassTransit.Middleware
 
         public async Task Send(SagaConsumeContext<TSaga, TMessage> context, IPipe<SagaConsumeContext<TSaga, TMessage>> next)
         {
-            StartedActivity? activity = LogContext.IfEnabled(OperationName.Saga.InitiateOrOrchestrate)?.StartSagaActivity(context);
+            StartedActivity? activity = LogContext.Current?.StartSagaActivity(context);
             try
             {
                 await context.Saga.Consume(context).ConfigureAwait(false);
 
                 await next.Send(context).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                activity?.AddExceptionEvent(ex);
+
+                throw;
             }
             finally
             {

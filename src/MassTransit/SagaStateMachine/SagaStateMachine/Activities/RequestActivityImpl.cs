@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
     using Contracts;
-    using Transports;
 
 
     public abstract class RequestActivityImpl<TInstance, TRequest, TResponse>
@@ -24,10 +23,9 @@
 
             var pipe = new SendRequestPipe(_request, context.ReceiveContext.InputAddress, requestId, sendTuple.Pipe);
 
-            var endpoint = serviceAddress == null
-                ? new ConsumeSendEndpoint(await context.ReceiveContext.PublishEndpointProvider.GetPublishSendEndpoint<TRequest>().ConfigureAwait
-                    (false), context, default)
-                : await context.GetSendEndpoint(serviceAddress).ConfigureAwait(false);
+            var endpoint = serviceAddress != null
+                ? await context.GetSendEndpoint(serviceAddress).ConfigureAwait(false)
+                : await context.ReceiveContext.PublishEndpointProvider.GetPublishEndpoint<TRequest>(context, default);
 
             await endpoint.Send(sendTuple.Message, pipe).ConfigureAwait(false);
 
@@ -38,7 +36,8 @@
                 var now = DateTime.UtcNow;
                 var expirationTime = now + _request.Settings.Timeout;
 
-                RequestTimeoutExpired<TRequest> message = new TimeoutExpired<TRequest>(now, expirationTime, context.Saga.CorrelationId, pipe.RequestId);
+                RequestTimeoutExpired<TRequest> message =
+                    new TimeoutExpired<TRequest>(now, expirationTime, context.Saga.CorrelationId, pipe.RequestId, sendTuple.Message);
 
                 if (context.TryGetPayload(out MessageSchedulerContext schedulerContext))
                     await schedulerContext.ScheduleSend(expirationTime, message).ConfigureAwait(false);
@@ -62,9 +61,9 @@
         class SendRequestPipe :
             IPipe<SendContext<TRequest>>
         {
+            readonly IPipe<SendContext<TRequest>> _pipe;
             readonly Request<TInstance, TRequest, TResponse> _request;
             readonly Uri _responseAddress;
-            readonly IPipe<SendContext<TRequest>> _pipe;
 
             public SendRequestPipe(Request<TInstance, TRequest, TResponse> request, Uri responseAddress, Guid requestId, IPipe<SendContext<TRequest>> pipe)
             {
@@ -101,12 +100,13 @@
             RequestTimeoutExpired<T>
             where T : class
         {
-            public TimeoutExpired(DateTime timestamp, DateTime expirationTime, Guid correlationId, Guid requestId)
+            public TimeoutExpired(DateTime timestamp, DateTime expirationTime, Guid correlationId, Guid requestId, T message)
             {
                 Timestamp = timestamp;
                 ExpirationTime = expirationTime;
                 CorrelationId = correlationId;
                 RequestId = requestId;
+                Message = message;
             }
 
             public DateTime Timestamp { get; }
@@ -116,6 +116,8 @@
             public Guid CorrelationId { get; }
 
             public Guid RequestId { get; }
+
+            public T Message { get; }
         }
     }
 }

@@ -51,12 +51,16 @@ namespace MassTransit.Middleware
         {
             BehaviorContext<TSaga, TMessage> behaviorContext = new BehaviorContextProxy<TSaga, TMessage>(_machine, context, context, _event);
 
-            EnabledActivitySource? activitySource = LogContext.IfEnabled(_activityName);
-            StartedActivity? activity = activitySource.HasValue
-                ? await activitySource.Value.StartSagaStateMachineActivity(behaviorContext).ConfigureAwait(false)
-                : null;
+            StartedActivity? activity = LogContext.Current?.StartSagaStateMachineActivity(behaviorContext);
             try
             {
+                if (activity != null && activity.Value.Activity.IsAllDataRequested)
+                {
+                    State<TSaga> beginState = await behaviorContext.StateMachine.Accessor.Get(behaviorContext).ConfigureAwait(false);
+                    if (beginState != null)
+                        activity?.SetTag(DiagnosticHeaders.BeginState, beginState.Name);
+                }
+
                 await _machine.RaiseEvent(behaviorContext).ConfigureAwait(false);
 
                 if (await _machine.IsCompleted(behaviorContext).ConfigureAwait(false))
@@ -66,12 +70,32 @@ namespace MassTransit.Middleware
             {
                 State<TSaga> currentState = await _machine.Accessor.Get(behaviorContext).ConfigureAwait(false);
 
-                throw new NotAcceptedStateMachineException(typeof(TSaga), typeof(TMessage), context.CorrelationId ?? Guid.Empty, currentState.Name, ex);
+                var stateMachineException = new NotAcceptedStateMachineException(typeof(TSaga), typeof(TMessage),
+                    context.CorrelationId ?? Guid.Empty, currentState.Name, ex);
+
+                activity?.AddExceptionEvent(stateMachineException);
+
+                throw stateMachineException;
+            }
+            catch (Exception exception)
+            {
+                activity?.AddExceptionEvent(exception);
+
+                throw;
             }
             finally
             {
-                activity?.AddTag(DiagnosticHeaders.EndState, (await _machine.Accessor.Get(behaviorContext).ConfigureAwait(false)).Name);
-                activity?.Stop();
+                if (activity != null)
+                {
+                    if (activity.Value.Activity.IsAllDataRequested)
+                    {
+                        State<TSaga> endState = await behaviorContext.StateMachine.Accessor.Get(behaviorContext).ConfigureAwait(false);
+                        if (endState != null)
+                            activity?.SetTag(DiagnosticHeaders.EndState, endState.Name);
+                    }
+
+                    activity.Value.Stop();
+                }
             }
         }
     }

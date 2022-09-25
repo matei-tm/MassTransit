@@ -26,6 +26,9 @@ namespace MassTransit.InMemoryTransport
 
         public void Apply(IMessageFabricPublishTopologyBuilder builder)
         {
+            if (Exclude)
+                return;
+
             var exchangeName = _messageTopology.EntityName;
 
             builder.ExchangeDeclare(exchangeName, ExchangeType);
@@ -44,9 +47,7 @@ namespace MassTransit.InMemoryTransport
 
         public override bool TryGetPublishAddress(Uri baseAddress, out Uri? publishAddress)
         {
-            var exchangeName = _messageTopology.EntityName;
-
-            publishAddress = new InMemoryEndpointAddress(new InMemoryHostAddress(baseAddress), exchangeName, exchangeType: ExchangeType);
+            publishAddress = new InMemoryEndpointAddress(new InMemoryHostAddress(baseAddress), _messageTopology.EntityName, exchangeType: ExchangeType);
             return true;
         }
 

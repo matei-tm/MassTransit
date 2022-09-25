@@ -38,6 +38,7 @@ namespace MassTransit.Serialization
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
+            Options.Converters.Add(new StringDecimalJsonConverter());
             Options.Converters.Add(new SystemTextJsonMessageDataConverter());
             Options.Converters.Add(new SystemTextJsonConverterFactory());
         }
@@ -107,9 +108,12 @@ namespace MassTransit.Serialization
                     return defaultValue;
                 case T returnValue:
                     return returnValue;
+                case string text when string.IsNullOrWhiteSpace(text):
+                    return defaultValue;
+                case string text when TypeConverterCache.TryGetTypeConverter(out ITypeConverter<T, string>? typeConverter)
+                    && typeConverter.TryConvert(text, out var result):
+                    return result;
                 case string text:
-                    if (TypeConverterCache.TryGetTypeConverter(out ITypeConverter<T, string>? typeConverter) && typeConverter.TryConvert(text, out var result))
-                        return result;
                     return GetObject<T>(JsonSerializer.Deserialize<JsonElement>(text));
                 case JsonElement jsonElement:
                     return GetObject<T>(jsonElement);
@@ -131,9 +135,11 @@ namespace MassTransit.Serialization
                     return defaultValue;
                 case T returnValue:
                     return returnValue;
+                case string text when string.IsNullOrWhiteSpace(text):
+                    return defaultValue;
+                case string text when TypeConverterCache.TryGetTypeConverter(out ITypeConverter<T, string>? typeConverter) && typeConverter.TryConvert(text, out var result):
+                    return result;
                 case string text:
-                    if (TypeConverterCache.TryGetTypeConverter(out ITypeConverter<T, string>? typeConverter) && typeConverter.TryConvert(text, out var result))
-                        return result;
                     return JsonSerializer.Deserialize<T>(text, Options);
                 case JsonElement jsonElement:
                     return jsonElement.Deserialize<T>(Options);
@@ -144,6 +150,14 @@ namespace MassTransit.Serialization
             return element.ValueKind == JsonValueKind.Null
                 ? defaultValue
                 : element.Deserialize<T>(Options);
+        }
+
+        public MessageBody SerializeObject(object? value)
+        {
+            if (value == null)
+                return new EmptyMessageBody();
+
+            return new SystemTextJsonObjectMessageBody(value, Options);
         }
 
         static T? GetObject<T>(JsonElement jsonElement)

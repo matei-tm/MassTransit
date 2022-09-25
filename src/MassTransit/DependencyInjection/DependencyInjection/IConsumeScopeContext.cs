@@ -18,5 +18,10 @@
 
         T GetService<T>()
             where T : class;
+
+        T CreateInstance<T>(params object[] arguments)
+            where T : class;
+
+        IDisposable PushConsumeContext(ConsumeContext context);
     }
 }

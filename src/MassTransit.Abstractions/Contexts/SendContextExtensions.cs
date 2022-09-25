@@ -56,6 +56,7 @@ namespace MassTransit
             headers.Set(MessageHeaders.Reason, "fault");
 
             headers.Set(MessageHeaders.FaultExceptionType, TypeCache.GetShortName(exception.GetType()));
+            headers.Set(MessageHeaders.FaultInputAddress, exceptionContext.InputAddress?.ToString());
             headers.Set(MessageHeaders.FaultMessage, exceptionMessage);
             headers.Set(MessageHeaders.FaultTimestamp, exceptionContext.ExceptionTimestamp.ToString("O"));
             headers.Set(MessageHeaders.FaultStackTrace, ExceptionUtil.GetStackTrace(exception));
@@ -86,6 +87,7 @@ namespace MassTransit
             adapter.Set(headers, MessageHeaders.Reason, "fault");
 
             adapter.Set(headers, MessageHeaders.FaultExceptionType, TypeCache.GetShortName(exception.GetType()));
+            adapter.Set(headers, MessageHeaders.FaultInputAddress, exceptionContext.InputAddress);
             adapter.Set(headers, MessageHeaders.FaultMessage, exceptionMessage);
             adapter.Set(headers, MessageHeaders.FaultTimestamp, exceptionContext.ExceptionTimestamp);
             adapter.Set(headers, MessageHeaders.FaultStackTrace, ExceptionUtil.GetStackTrace(exception));
@@ -154,6 +156,18 @@ namespace MassTransit
             sendContext.MessageId = NewId.NextGuid();
 
             return sendContext;
+        }
+
+        /// <summary>
+        /// Returns the original MessageId from the message headers, or the MessageId if not present
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static Guid? GetOriginalMessageId(this ConsumeContext context)
+        {
+            return context.TryGetHeader(MessageHeaders.OriginalMessageId, out Guid? originalMessageId)
+                ? originalMessageId
+                : context.MessageId;
         }
 
         /// <summary>
