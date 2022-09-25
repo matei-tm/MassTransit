@@ -25,22 +25,22 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
             scope.Add("type", "rabbitMqMessage");
         }
 
-        ConnectHandle IReceiveObserverConnector.ConnectReceiveObserver(IReceiveObserver observer)
+        public ConnectHandle ConnectReceiveObserver(IReceiveObserver observer)
         {
             return _context.ConnectReceiveObserver(observer);
         }
 
-        ConnectHandle IPublishObserverConnector.ConnectPublishObserver(IPublishObserver observer)
+        public ConnectHandle ConnectPublishObserver(IPublishObserver observer)
         {
             return _context.ConnectPublishObserver(observer);
         }
 
-        ConnectHandle ISendObserverConnector.ConnectSendObserver(ISendObserver observer)
+        public ConnectHandle ConnectSendObserver(ISendObserver observer)
         {
             return _context.ConnectSendObserver(observer);
         }
 
-        async Task IRabbitMqMessageReceiver.Handle(BasicDeliverEventArgs message, CancellationToken cancellationToken, Action<ReceiveContext> contextCallback)
+        public async Task Handle(BasicDeliverEventArgs message, CancellationToken cancellationToken, Action<ReceiveContext> contextCallback)
         {
             var context = new RabbitMqReceiveContext(
                 exchange: message.Exchange,
@@ -54,7 +54,7 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
 
             contextCallback?.Invoke(context);
 
-            CancellationTokenRegistration registration;
+            CancellationTokenRegistration registration = default;
             if (cancellationToken.CanBeCanceled)
             {
                 registration = cancellationToken.Register(context.Cancel);
@@ -71,12 +71,12 @@ namespace MassTransit.WebJobs.RabbitMqIntegration
             }
         }
 
-        ConnectHandle IConsumeMessageObserverConnector.ConnectConsumeMessageObserver<T>(IConsumeMessageObserver<T> observer)
+        public ConnectHandle ConnectConsumeMessageObserver<T>(IConsumeMessageObserver<T> observer) where T : class
         {
             return _context.ReceivePipe.ConnectConsumeMessageObserver(observer);
         }
 
-        ConnectHandle IConsumeObserverConnector.ConnectConsumeObserver(IConsumeObserver observer)
+        public ConnectHandle ConnectConsumeObserver(IConsumeObserver observer)
         {
             return _context.ReceivePipe.ConnectConsumeObserver(observer);
         }
