@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../signing.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>MassTransit</RootNamespace>
+    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>MassTransit.WebJobs.Extensions.RabbitMQ</PackageId>
+    <Title>MassTransit.WebJobs.ServiceBus</Title>
+    <PackageTags>MassTransit;Azure;WebJobs;AzureFunctions; RabbitMq</PackageTags>
+    <Description>MassTransit Azure WebJobs rabbitMq support; $(Description)</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.RabbitMQ" Version="2.0.0-preview" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <ProjectReference Include="..\..\MassTransit\MassTransit.csproj" />
+    <ProjectReference Include="..\MassTransit.RabbitMqTransport\MassTransit.RabbitMqTransport.csproj" />
+  </ItemGroup>
+</Project>

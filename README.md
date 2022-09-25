@@ -16,9 +16,21 @@ Build Status
 
 Branch | Status
 --- | :---:
+webjobs-rabbitmq-integration | [![Build Status](https://matei-tm.visualstudio.com/AzureFunctionsWithMassTransit/_apis/build/status/matei-tm.MassTransit?branchName=webjobs-rabbitmq-integration)](https://matei-tm.visualstudio.com/AzureFunctionsWithMassTransit/_build/latest?definitionId=10&branchName=webjobs-rabbitmq-integration)
 master | [![master](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml/badge.svg?branch=master&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml)
 develop | [![develop](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml/badge.svg?branch=develop&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/build.yml)
 documentation | [![documentation](https://github.com/MassTransit/MassTransit/actions/workflows/docs.yml/badge.svg?branch=develop&event=push)](https://github.com/MassTransit/MassTransit/actions/workflows/docs.yml)
+
+---
+**NOTE**
+
+Due to breaking changes, involved by [azure-functions-rabbitmq-extension repo](https://github.com/Azure/azure-functions-rabbitmq-extension), related to RabbitMQ.Client v6, the current repo is not using the non-compatible nuget Microsoft.Azure.WebJobs.Extensions.RabbitMQ v1.1.0.  
+In order to solve this issue the following actions were taken:
+
+- a prerelease nuget package was published to myget feed https://www.myget.org/F/matei-tm/api/v3/index.json
+- a NuGet.Config file was placed in root
+
+---
 
 MassTransit NuGet Packages
 ---------------------------
